@@ -5,7 +5,7 @@ interface setShowCreatePost {
 
 export default function CreatePostForm( {setShowCreatePost} : setShowCreatePost ) {
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-50 z-50">
+    <div className="flex items-center justify-center min-h-screen z-50 ">
       <div className="w-full max-w-sm bg-white rounded-xl shadow-lg">
         {/* Header */}
         <div className="bg-gradient-to-r from-purple-600 to-pink-500 text-white text-lg font-semibold rounded-t-xl px-6 py-3">

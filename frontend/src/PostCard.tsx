@@ -12,24 +12,24 @@ const PostCard = ({ post }: { post: Post }) => {
   const [showMenu, setShowMenu] = useState(false);
 
   return (
-    <div className="bg-white rounded-2xl shadow-sm hover:shadow-md transition-shadow overflow-hidden border border-gray-100 relative">
+    <div className="rounded-xl border border-gray-200 shadow-sm bg-white absolute overflow-hidden relative">
       {/* Header */}
       <div className="flex items-center justify-between p-4">
         <div className="flex items-center gap-3">
-          <div className="w-11 h-11 rounded-full border-2 border-indigo-500 bg-gradient-to-br from-indigo-400 to-pink-400 hover:scale-105 transition-transform cursor-pointer"></div>
+          <div className="w-10 h-10 rounded-full bg-green-500 border border-green-600"></div>
           <div>
-            <p className="font-semibold text-gray-900 hover:text-indigo-600 cursor-pointer">
+            <p className="font-semibold text-gray-800 cursor-pointer hover:text-green-600">
               {post.user.username}
             </p>
             <p className="text-xs text-gray-500">{post.timestamp}</p>
           </div>
         </div>
 
-        {/* Kebab Menu */}
+        {/* Menu */}
         <div className="relative">
           <button
             onClick={() => setShowMenu(!showMenu)}
-            className="text-gray-600 hover:text-gray-900 p-2 hover:bg-gray-100 rounded-full transition-colors"
+            className="p-1 text-gray-600 hover:text-gray-900"
           >
             <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
               <circle cx="12" cy="6" r="1.5" />
@@ -38,16 +38,15 @@ const PostCard = ({ post }: { post: Post }) => {
             </svg>
           </button>
 
-          {/* Dropdown Menu */}
           {showMenu && (
-            <div className="absolute right-0 mt-2 w-40 bg-white border border-gray-100 rounded-xl shadow-lg z-20 overflow-hidden animate-fadeIn">
-              <button className="w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-50 hover:text-indigo-600 text-sm font-medium transition-colors">
+            <div className="absolute right-0 mt-2 w-36 bg-white border border-gray-200 rounded-md shadow-md">
+              <button className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-green-50 hover:text-green-700">
                 Follow
               </button>
-              <button className="w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-50 hover:text-indigo-600 text-sm font-medium transition-colors">
+              <button className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-green-50 hover:text-green-700">
                 Share
               </button>
-              <button className="w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-50 hover:text-red-600 text-sm font-medium transition-colors border-t border-gray-100">
+              <button className="block w-full text-left px-4 py-2 text-sm text-red-600 border-t border-gray-100 hover:bg-red-50">
                 Report
               </button>
             </div>
@@ -56,18 +55,17 @@ const PostCard = ({ post }: { post: Post }) => {
       </div>
 
       {/* Post Image Placeholder */}
-      <div className="bg-gradient-to-br from-indigo-50 via-pink-50 to-purple-50 flex items-center justify-center h-96 relative group">
-        <div className="absolute inset-0 bg-gradient-to-br from-indigo-100/50 to-pink-100/50 opacity-0 group-hover:opacity-100 transition-opacity"></div>
-        <span className="text-gray-400 text-sm font-medium z-10">Post Content</span>
+      <div className="bg-green-50 flex items-center justify-center h-80">
+        <span className="text-gray-400 text-sm">Post Content</span>
       </div>
 
-      {/* Post Actions */}
-      <div className="px-4 pt-3 pb-2">
-        <div className="flex items-center justify-between mb-3">
+      {/* Actions */}
+      <div className="px-4 py-3">
+        <div className="flex items-center justify-between mb-2">
           <div className="flex items-center gap-4">
-            <button className="text-gray-600 hover:text-red-500 transition-all transform hover:scale-110">
+            <button className="text-gray-600 hover:text-red-500">
               <svg
-                className="w-7 h-7"
+                className="w-6 h-6"
                 fill="none"
                 stroke="currentColor"
                 strokeWidth={2}
@@ -81,9 +79,9 @@ const PostCard = ({ post }: { post: Post }) => {
               </svg>
             </button>
 
-            <button className="text-gray-600 hover:text-indigo-600 transition-all transform hover:scale-110">
+            <button className="text-gray-600 hover:text-green-600">
               <svg
-                className="w-7 h-7"
+                className="w-6 h-6"
                 fill="none"
                 stroke="currentColor"
                 strokeWidth={2}
@@ -97,9 +95,9 @@ const PostCard = ({ post }: { post: Post }) => {
               </svg>
             </button>
 
-            <button className="text-gray-600 hover:text-indigo-600 transition-all transform hover:scale-110">
+            <button className="text-gray-600 hover:text-green-600">
               <svg
-                className="w-7 h-7"
+                className="w-6 h-6"
                 fill="none"
                 stroke="currentColor"
                 strokeWidth={2}
@@ -114,9 +112,9 @@ const PostCard = ({ post }: { post: Post }) => {
             </button>
           </div>
 
-          <button className="text-gray-600 hover:text-indigo-600 transition-all transform hover:scale-110">
+          <button className="text-gray-600 hover:text-green-600">
             <svg
-              className="w-6 h-6"
+              className="w-5 h-5"
               fill="none"
               stroke="currentColor"
               strokeWidth={2}
@@ -131,16 +129,17 @@ const PostCard = ({ post }: { post: Post }) => {
           </button>
         </div>
 
+        {/* Caption */}
         {post.caption && (
-          <div className="text-sm mb-2">
-            <span className="font-semibold mr-2 text-gray-900">
+          <div className="text-sm text-gray-700 mb-1">
+            <span className="font-semibold text-gray-900 mr-2">
               {post.user.username}
             </span>
-            <span className="text-gray-700">{post.caption}</span>
+            {post.caption}
           </div>
         )}
 
-        <button className="text-xs text-gray-400 hover:text-gray-600 font-medium">
+        <button className="text-xs text-gray-500 hover:text-gray-700">
           View all comments
         </button>
       </div>

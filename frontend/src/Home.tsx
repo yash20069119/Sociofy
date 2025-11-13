@@ -3,9 +3,9 @@ import CreatePostForm from "./CreatePostForm";
 import PostCard from "./PostCard";
 import Navbar from "./Navbar";
 
-const Home = () => {
+const Home = ({user}) => {
   const [showCreatePost, setShowCreatePost] = useState(false);
-
+  console.log(user);
   const posts = [
     { id: 1, user: { username: "utkarsh" }, caption: "A perfect day to code! 💻✨", timestamp: "2h ago" },
     { id: 2, user: { username: "dev_dude" }, caption: "Frontend magic in progress 🎨", timestamp: "5h ago" },
@@ -20,18 +20,19 @@ const Home = () => {
   ];
 
   return (
-    <div className="w-full min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
-      <Navbar onCreatePostClick={() => setShowCreatePost(true)} />
+<div className="relative w-full min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 overflow-hidden">   
+     <Navbar onCreatePostClick={() => setShowCreatePost(true)} />
+              <div className="absolute inset-0 bg-[url('/bg.png')] bg-no-repeat bg-fixed bg-cover backdrop-blur-lg filter blur-lg z-0"></div>
 
       <div className="max-w-8xl mx-auto flex justify-center gap-10 px-6 py-10">
-        <div className="w-full flex-1 max-w-3xl space-y-8">
+        <div className="w-full flex-1 max-w-3xl space-y-8 z-10">
           {/* Stories */}
           <div className="bg-white rounded-2xl shadow-sm p-5 border border-gray-100">
             <div className="flex gap-5 overflow-x-auto pb-2">
               {[...Array(8)].map((_, index) => (
                 <div key={index} className="flex flex-col items-center gap-2 min-w-fit cursor-pointer group">
                   <div className="relative">
-                    <div className="w-16 h-16 rounded-full p-0.5 bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 group-hover:scale-110 transition-transform">
+                    <div className="w-16 h-16 rounded-full p-0.5 bg-gradient-to-br bg-gray-50 / bg-gray-100 / text-gray-700 group-hover:scale-110 transition-transform">
                       <div className="w-full h-full rounded-full bg-gradient-to-br from-indigo-300 to-pink-300 border-2 border-white"></div>
                     </div>
                     {index === 0 && (
@@ -79,10 +80,10 @@ const Home = () => {
               {/* Centered Modal */}
               <div className="fixed inset-0 flex items-center justify-center z-50">
                 <div className="relative w-full max-w-lg mx-4 animate-fadeIn">
-                  <div className="bg-white rounded-2xl shadow-2xl p-6">
+                  <div className="">
                     <button
                       onClick={() => setShowCreatePost(false)}
-                      className="absolute top-3 right-4 text-gray-500 hover:text-gray-800 text-xl"
+                      className="absolute top-3 right-4 hover:text-gray-800 text-xl"
                     >
                       ✕
                     </button>
@@ -102,13 +103,13 @@ const Home = () => {
         </div>
 
         {/* Sidebar */}
-        <aside className="hidden lg:block w-80 space-y-6">
+        <aside className="hidden lg:block w-80 space-y-6 sticky top-24 h-fit">
           <div className="bg-white rounded-2xl shadow-sm p-5 border border-gray-100 sticky top-24">
             <div className="flex items-center gap-3 mb-6 pb-6 border-b border-gray-100">
               <div className="w-14 h-14 rounded-full bg-gradient-to-br from-indigo-400 to-pink-400 hover:scale-105 transition-transform cursor-pointer"></div>
               <div>
-                <p className="font-bold text-gray-900">Your Profile</p>
-                <p className="text-sm text-gray-500">@username</p>
+                <p className="font-bold text-gray-900">{user.name}</p>
+                <p className="text-sm text-gray-500">@{user.name}</p>
               </div>
             </div>
 
