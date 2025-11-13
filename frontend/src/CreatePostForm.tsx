@@ -12,7 +12,7 @@ export default function CreatePostForm( {setShowCreatePost} : setShowCreatePost 
   const [caption, setCaption] = useState("");
   const [loading, setLoading] = useState(false);
 
-    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
       const reader = new FileReader();
@@ -24,30 +24,38 @@ export default function CreatePostForm( {setShowCreatePost} : setShowCreatePost 
   };
 
 
-    const handleSubmit = async () => {
-    if (!image) {
-      alert("Please select an image first.");
-      return;
-    }
+  const handleSubmit = async () => {
+  if (!image) {
+    alert("Please select an image first.");
+    return;
+  }
 
-    try {
-      setLoading(true);
-      const response = await axios.post("http://localhost:3000/api/posts/", {
-        image: image,
-        caption,
-      });
+  try {
+    setLoading(true);
 
-      console.log("Post uploaded successfully:", response.data);
-      alert("Post uploaded successfully!");
+    const response = await axios.post(
+      "http://localhost:3000/api/posts/",
+      { image, caption },
+      {
+        withCredentials: true, 
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
 
-      setShowCreatePost(false);
-    } catch (error) {
-      console.error("Error uploading post:", error);
-      alert("Failed to upload post.");
-    } finally {
-      setLoading(false);
-    }
-  };
+    console.log("Post uploaded successfully:", response.data);
+    alert("Post uploaded successfully!");
+
+    setShowCreatePost(false);
+  } catch (error) {
+    console.error("Error uploading post:", error);
+    alert("Failed to upload post.");
+  } finally {
+    setLoading(false);
+  }
+};
+
 
 
 
@@ -59,7 +67,7 @@ export default function CreatePostForm( {setShowCreatePost} : setShowCreatePost 
           Create New Post
         </div>
 
-       {/* Upload Section */}
+        {/* Upload Section */}
         <div className="p-6">
           <div className="border-2 border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center py-10 text-center">
             {image ? (
@@ -111,7 +119,10 @@ export default function CreatePostForm( {setShowCreatePost} : setShowCreatePost 
 
           {/* Caption Input */}
           <div className="mt-5">
-            <label htmlFor="caption" className="block text-sm font-medium text-gray-700 mb-2">
+            <label
+              htmlFor="caption"
+              className="block text-sm font-medium text-gray-700 mb-2"
+            >
               Caption
             </label>
             <textarea
@@ -128,7 +139,7 @@ export default function CreatePostForm( {setShowCreatePost} : setShowCreatePost 
         {/* Footer Buttons */}
         <div className="flex justify-between px-6 pb-5">
           <button className="bg-gray-200 text-gray-700 px-6 py-2 rounded-md font-medium hover:bg-gray-300"
-          onClick={() => setShowCreatePost(false)}>
+            onClick={() => setShowCreatePost(false)}>
             Cancel
           </button>
           <button
