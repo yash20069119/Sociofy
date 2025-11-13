@@ -1,4 +1,3 @@
- 
 <div align="center">
 
 #  **Sociofy**
@@ -11,47 +10,47 @@
 | Roll No | Name | Contribution |
 |:--------:|:------|:--------------|
 | B24CS505 | Harshit Kanpal | Frontend & UI Design |
-| B24CS | Utkarsh Umap | Backend & Database Integration |
-| B24CS | Yash Bhardwaj | Testing, Documentation & Deployment |
+| B24CS506 | Utkarsh Umap | Backend & Database Integration |
+| B24CS507 | Yash Bhardwaj | Testing, Documentation & Deployment |
 
 ---
 
 ### **Project Overview**
 
-This project, **Project Title**, is developed as part of the course evaluation.  
-It aims to **[briefly describe the purpose — e.g., help users manage tasks efficiently using a responsive web interface]**.
+This project, **Sociofy**, is developed as part of the course evaluation.  
+It aims to provide a modern social media web application where users can create posts, view others’ content, and manage their profiles through a responsive and interactive interface.
 
 </div>
 
 ---
 
 ##  **Objectives**
-- Develop a functional, user-friendly application  
-- Apply full-stack development principles  
-- Integrate and manage databases  
-- Use Git & GitHub for version control and collaboration  
+- Develop a functional, user-friendly social media web application  
+- Apply full-stack development principles using React, Node.js, and MongoDB  
+- Integrate and manage database connections using Mongoose  
+- Use Git & GitHub for version control and team collaboration  
 
 ---
 
 ##  **Tech Stack**
 
-| Category | Technologies Used |
-|-----------|-------------------|
-| Frontend | HTML5, CSS3, JavaScript, React.js |
-| Backend | Node.js / Flask / Django |
-| Database | MySQL / MongoDB |
-| Tools | VS Code, Git, GitHub, Postman |
+| Category              | Technologies Used                                |
+| --------------------- | ------------------------------------------------ |
+| **Frontend**          | React.js, Tailwind CSS, JavaScript (ES6+), Axios |
+| **Backend**           | Node.js, Express.js                              |
+| **Database**          | MongoDB, Mongoose                                |
+| **Tools & Utilities** | VS Code, Git, GitHub, Postman, npm               |
 
 ---
 
 ## **Features**
--  User Authentication  
--  Responsive Design  
--  CRUD Operations  
--  Data Visualization  
--  Error Handling  
--  Attractive UI/UX  
--  Additional Enhancements (Dark Mode / API Integration)
+-  User Authentication (Login / Signup)  
+-  Responsive and Modern UI  
+-  CRUD Operations for Posts  
+-  Profile Management  
+-  Session Handling with Cookies  
+-  Error Handling and Validation  
+-  Additional Enhancements (Dark Mode, Feed System)
 
 ---
 
@@ -59,17 +58,25 @@ It aims to **[briefly describe the purpose — e.g., help users manage tasks eff
 
 ```
 
-<Project_Name>/
+Sociofy/
 │
-├── src/                 # Source code files
-│   ├── frontend/        # HTML, CSS, JS, Components
-│   ├── backend/         # Server-side code
-│   └── database/        # Database scripts
+├── backend/             # Server-side code (Node.js + Express)
+│   ├── models/          # Mongoose Schemas
+│   ├── routes/          # API Endpoints
+│   ├── config/          # Database Configuration
+│   └── server.js        # Main Server File
 │
-├── report/              # Project report
-├── presentation/        # PPT file
+├── frontend/            # React Frontend
+│   ├── src/             # React Source Files
+│   │   ├── components/  # UI Components
+│   │   ├── pages/       # Main Pages (Home, Profile, Login, Signup)
+│   │   ├── assets/      # Images and Media
+│   │   └── App.jsx      # Main Application File
+│
+├── report/              # Project Report
+├── presentation/        # Presentation Slides
 ├── README.md            # This file
-└── requirements.txt     # Dependencies list
+└── package.json         # Dependencies List
 
 ````
 
@@ -79,8 +86,8 @@ It aims to **[briefly describe the purpose — e.g., help users manage tasks eff
 
 ### 1️⃣ Clone the Repository
 ```bash
-git clone https://github.com/<your-username>/<repo-name>.git
-cd <repo-name>
+git clone https://github.com/<your-username>/sociofy.git
+cd sociofy
 ````
 
 ### 2️⃣ Install Dependencies
@@ -91,94 +98,84 @@ For Node.js:
 npm install
 ```
 
-For Python:
+For Backend (if separate):
 
 ```bash
-pip install -r requirements.txt
+cd backend
+npm install
+```
+
+For Frontend:
+
+```bash
+cd frontend
+npm install
 ```
 
 ### 3️⃣ Setup Database
 
-```bash
-mysql -u root -p < database/project.sql
-```
-
-Then, update credentials in the backend config file.
+Ensure MongoDB is running locally or provide your MongoDB Atlas URI in the backend configuration file (`config/db.js`).
 
 ### 4️⃣ Run the Application
 
-For Node.js:
+For Backend:
 
 ```bash
 npm start
 ```
 
-For Flask:
+For Frontend:
 
 ```bash
-python app.py
-```
-
-For Django:
-
-```bash
-python manage.py runserver
+npm run dev
 ```
 
 ### 5️ Open in Browser
 
-`http://localhost:3000`
+`http://localhost:5173`  (Frontend)
+`http://localhost:3000`  (Backend API)
 
 ---
 
-##  **Steps Followed**
+## **Steps Followed**
 
 1. Problem Identification
 2. Requirement Gathering
-3. Design & Architecture
-4. Implementation
-5. Testing & Debugging
-6. Deployment
-7. Version Control via GitHub
+3. UI/UX Design and Architecture
+4. Backend API Development
+5. Frontend Implementation
+6. Integration and Testing
+7. Deployment and Documentation
+8. Version Control via GitHub
 
 ---
 
-##  **Outputs / Screenshots**
+## **Outputs / Screenshots**
 
-| Screenshot                         | Description    |
-| ---------------------------------- | -------------- |
-| ![Home Page](assets/home.png)      | Home screen    |
-| ![Dashboard](assets/dashboard.png) | Dashboard view |
-
----
-
-##  **Live Links**
-
+| Screenshot                          | Description              |
+| ----------------------------------- | ------------------------ |
+| ![Home Page](assets/home.png)       | Home screen showing feed |
+| ![Profile Page](assets/profile.png) | User profile view        |
+| ![Login Page](assets/login.png)     | Login screen             |
 
 ---
 
-##  **Report Summary**
+## **Live Links**
 
-Located in `/report` folder.
-Includes:
-
-* Introduction
-* Methodology
-* Implementation
-* Results
-* Conclusion
+Frontend (Vercel): *Coming Soon*
+Backend (Render / Railway): *Coming Soon*
+GitHub Repository: [https://github.com/<your-username>/sociofy](https://github.com/<your-username>/sociofy)
 
 ---
-
-
 
 <div align="center">
 
-###  **Contact**
+### **Contact**
 
- [your.email@example.com](mailto:your.email@example.com)
- [GitHub Profile](https://github.com/<your-username>)
+[harshitkanpal@example.com](mailto:harshitkanpal@example.com)
+[utkarshumap@example.com](mailto:utkarshumap@example.com)
+[yashbhardwaj@example.com](mailto:yashbhardwaj@example.com)
+[GitHub Profile](https://github.com/<your-username>)
 
 </div>
-```
  
