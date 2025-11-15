@@ -5,6 +5,7 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const cookieParser = require("cookie-parser");
 const userModel = require("./models/user");
+const postRoutes = require("./routes/postRoutes");
 require("dotenv").config();
 
 const app = express();
@@ -16,12 +17,16 @@ app.use(cors({
   credentials: true
 }));
 
+app.use(express.json({limit: "10mb"}));
+
 
 mongoose.connect(process.env.MONGO_URL)
   .then(() => console.log(" Connected to MongoDB"))
   .catch(err => console.error(err));
 
 const JWT_SECRET = process.env.JWT_SECRET;
+
+app.use("/api/posts", postRoutes);
 
 // Registrating user
 app.post("/register", async (req, res) => {
