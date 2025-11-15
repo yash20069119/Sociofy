@@ -1,16 +1,13 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import axios from "axios";
 import CreatePostForm from "./CreatePostForm";
 import PostCard from "./PostCard";
 import Navbar from "./Navbar";
 
-const Home = ({user}) => {
+const Home = ({ user }) => {
   const [showCreatePost, setShowCreatePost] = useState(false);
-  console.log(user);
-  const posts = [
-    { id: 1, user: { username: "utkarsh" }, caption: "A perfect day to code! 💻✨", timestamp: "2h ago" },
-    { id: 2, user: { username: "dev_dude" }, caption: "Frontend magic in progress 🎨", timestamp: "5h ago" },
-    { id: 3, user: { username: "coder_queen" }, caption: "Building something amazing today! 🚀", timestamp: "8h ago" },
-  ];
+  const [posts, setPosts] = useState([]);
+  console.log("User on home page :", user);
 
   const suggestions = [
     { id: 1, username: "react_girl" },
@@ -19,10 +16,39 @@ const Home = ({user}) => {
     { id: 4, username: "code_ninja" },
   ];
 
+
+  useEffect(() => {
+    const fetchPosts = async () => {
+      try {
+        const res = await axios.get("http://localhost:3000/api/posts", {
+          withCredentials: true,
+        });
+        setPosts(res.data);
+      } catch (err) {
+        console.error("Error fetching posts:", err);
+      }
+    };
+    fetchPosts();
+  }, [showCreatePost]);
+
+
+  const handleLike = (postId) => {
+    setPosts((prev) =>
+      prev.map((p) =>
+        p._id === postId ? { ...p, likes: (p.likes || 0) + 1 } : p
+      )
+    );
+  };
+
+
+  const handleComment = (postId, comment) => {
+    console.log("Comment on", postId, ":", comment);
+  };
+
   return (
-<div className="relative w-full min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 overflow-hidden">   
-     <Navbar onCreatePostClick={() => setShowCreatePost(true)} />
-              <div className="absolute inset-0 bg-[url('/bg.png')] bg-no-repeat bg-fixed bg-cover backdrop-blur-lg filter blur-lg z-0"></div>
+    <div className="relative w-full min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 overflow-hidden">
+      <Navbar onCreatePostClick={() => setShowCreatePost(true)} />
+      <div className="absolute inset-0 bg-[url('/bg.png')] bg-no-repeat bg-fixed bg-cover backdrop-blur-lg filter blur-lg z-0"></div>
 
       <div className="max-w-8xl mx-auto flex justify-center gap-10 px-6 py-10">
         <div className="w-full flex-1 max-w-3xl space-y-8 z-10">
@@ -80,7 +106,7 @@ const Home = ({user}) => {
               {/* Centered Modal */}
               <div className="fixed inset-0 flex items-center justify-center z-50">
                 <div className="relative w-full max-w-lg mx-4 animate-fadeIn">
-                  <div className="">
+                  <div >
                     <button
                       onClick={() => setShowCreatePost(false)}
                       className="absolute top-3 right-4 hover:text-gray-800 text-xl"
@@ -95,11 +121,26 @@ const Home = ({user}) => {
           )}
 
 
-
           {/* Post Feed */}
-          {posts.map((post) => (
-            <PostCard key={post.id} post={post} />
-          ))}
+          {posts && posts.length > 0 ? (
+            posts.map((post) => (
+              <PostCard
+                key={post._id}
+                post={{
+                  user: { username: post.user?.name || "Unknown" },
+                  timestamp: new Date(post.createdAt).toLocaleString(),
+                  caption: post.caption,
+                  image: post.image, // base64 string
+                  likes: post.likes,
+                  comments: post.comments,
+                  _id: post._id,
+                }}
+              />
+            ))
+          ) : (
+            <p className="text-center text-gray-500 mt-6">No posts yet.</p>
+          )}
+
         </div>
 
         {/* Sidebar */}
