@@ -3,33 +3,83 @@ import Navbar from "./Navbar";
 import CreatePostForm from "./CreatePostForm";
 import axios from "axios";
 import PostCard from "./PostCard";
+import * as interfaces from "./interfaces"
 
-const Profile = ({user}) => {
+interface profilee{
+  user:interfaces.User
+}
+const Profile = ({user}:profilee) => {
   const [activeTab, setActiveTab] = useState("posts");
   const [showCreatePost, setShowCreatePost] = useState(false);
   const [userPosts, setUserPosts] = useState([]);
-  const followers = user.followers.length;
-  const following = user.following.length;
+  const [currentUser, setCurrentUser] = useState(user); // Add this state
+  const followers = currentUser.followers.length; // Update to currentUser
+  const following = currentUser.following.length; // Update to currentUser
 
-    useEffect(() => {
+  useEffect(() => {
     const fetchPosts = async () => {
       try {
         const res = await axios.get(`http://localhost:3000/api/posts/user/${user._id}`, {
           withCredentials: true,
         });
         setUserPosts(res.data);
-      } catch (err) {
+      } catch (err: any) {
         console.error("Error fetching posts:", err);
+        alert(err.response?.data?.message || "Failed to load posts");
       }
     };
     fetchPosts();
-  }, [showCreatePost]);
+  }, [showCreatePost, user._id]);
+
+  // Add follow/unfollow handlers
+  const handleFollow = async (targetId) => {
+    try {
+      await axios.post(
+        `http://localhost:3000/api/users/${targetId}/follow`,
+        {},
+        { withCredentials: true }
+      );
+      setCurrentUser((prev) => ({
+        ...prev,
+        following: [...prev.following, targetId],
+      }));
+    } catch (err: any) {
+      console.error("Follow error:", err);
+      alert(err.response?.data?.message || "Failed to follow user");
+    }
+  };
+
+  const handleUnfollow = async (targetId) => {
+    try {
+      await axios.post(
+        `http://localhost:3000/api/users/${targetId}/unfollow`,
+        {},
+        { withCredentials: true }
+      );
+      setCurrentUser((prev) => ({
+        ...prev,
+        following: prev.following.filter((id) => id !== targetId),
+      }));
+    } catch (err: any) {
+      console.error("Unfollow error:", err);
+      alert(err.response?.data?.message || "Failed to unfollow user");
+    }
+  };
+
+  // Add function to update trust score
+  const updateTrustScore = (newScore) => {
+    setCurrentUser(prev => ({
+      ...prev,
+      trustScore: newScore
+    }));
+  };
 
   console.log("User Posts:", userPosts);
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
-      <Navbar onCreatePostClick={() => setShowCreatePost(false)} />
+      <Navbar onCreatePostClick={() => setShowCreatePost(false)} user={currentUser}/> {/* Update to currentUser */}
+      
       {/* Create Post Modal */}
       {showCreatePost && (
         <>
@@ -68,7 +118,7 @@ const Profile = ({user}) => {
           {/* User Info */}
           <div className="flex flex-col items-center mt-6 space-y-3">
             <div className="flex items-center gap-3">
-              <h2 className="text-2xl font-semibold">{user.name}</h2>
+              <h2 className="text-2xl font-semibold">{currentUser.name}</h2> {/* Update to currentUser */}
               <button className="px-4 py-1 border border-gray-300 rounded-md text-sm hover:bg-gray-100 transition">
                 Edit Profile
               </button>
@@ -77,7 +127,7 @@ const Profile = ({user}) => {
             {/* Stats */}
             <div className="flex justify-center items-center space-x-10 text-gray-700 text-sm mt-1">
               <p>
-                <span className="font-semibold text-gray-900">36</span> posts
+                <span className="font-semibold text-gray-900">{userPosts.length}</span> posts {/* Update to actual count */}
               </p>
               <p>
                 <span className="font-semibold text-gray-900">{followers}</span> followers
@@ -85,11 +135,14 @@ const Profile = ({user}) => {
               <p>
                 <span className="font-semibold text-gray-900">{following}</span> following
               </p>
+              <p>
+                <span className="font-semibold text-gray-900">{currentUser.trustScore}</span> trust score {/* Add trust score display */}
+              </p>
             </div>
 
             {/* Bio */}
             <div className="mt-3 text-center text-gray-600 text-sm leading-relaxed">
-              <p className="font-medium text-gray-800">{user.name}</p>
+              <p className="font-medium text-gray-800">{currentUser.name}</p> {/* Update to currentUser */}
               <p>Living life to the fullest! 🌿</p>
             </div>
           </div>
@@ -120,28 +173,29 @@ const Profile = ({user}) => {
         <div className="w-full max-w-5xl mt-8 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
           {activeTab === "posts" && (
             <>
-                        {/* Post Feed */}
-          {userPosts && userPosts.length > 0 ? (
-            userPosts.map((post) => (
-              <PostCard
-                key={post._id}
-                post={{
-                  user: { username: post.user?.name || "Unknown" },
-                  userId: post.user?._id,
-                  timestamp: new Date(post.createdAt).toLocaleString(),
-                  caption: post.caption,
-                  image: post.image,
-                  likes: post.likes,
-                  comments: post.comments,
-                  _id: post._id,
-                }}
-                currentUser={user}
-
-              />
-            ))
-          ) : (
-            <p className="text-center text-gray-500 mt-6">No posts yet.</p>
-          )}
+              {userPosts && userPosts.length > 0 ? (
+                userPosts.map((post) => (
+                  <PostCard
+                    key={post._id}
+                    post={{
+                      user: { username: post.user?.name || "Unknown" },
+                      userId: post.user?._id,
+                      timestamp: new Date(post.createdAt).toLocaleString(),
+                      caption: post.caption,
+                      image: post.image,
+                      likes: post.likes,
+                      comments: post.comments,
+                      _id: post._id,
+                    }}
+                    currentUser={currentUser} // Pass currentUser instead of user
+                    setCurrentUser={setCurrentUser} // Pass setter to update trust score
+                    handleFollow={handleFollow}
+                    handleUnfollow={handleUnfollow}
+                  />
+                ))
+              ) : (
+                <p className="text-center text-gray-500 mt-6">No posts yet.</p>
+              )}
             </>
           )}
 

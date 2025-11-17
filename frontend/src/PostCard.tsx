@@ -1,16 +1,8 @@
 import { useState } from "react";
 import axios from "axios";
+import * as interfaces from "./interfaces"
 
-interface Post {
-  _id: string;
-  user: { username: string };
-  userId: string;
-  timestamp: string;
-  caption?: string;
-  image?: string;
-  likes?: string[];
-  comments?: { user: string; text: string }[] | string[];
-}
+
 
 const PostCard = ({
   post,
@@ -18,7 +10,7 @@ const PostCard = ({
   handleFollow,
   handleUnfollow,
 }: {
-  post: Post;
+  post: interfaces.Post;
   currentUser: any;
   handleFollow: (id: string) => void;
   handleUnfollow: (id: string) => void;
@@ -51,6 +43,11 @@ const PostCard = ({
   };
 
   const handleComment = async () => {
+    if (currentUser.trustScore < 20) {
+      alert("Your Trust Score is too low to comment.");
+      return;
+    }
+
     if (!commentText.trim()) return;
 
     try {
@@ -183,8 +180,16 @@ const PostCard = ({
 
           {/* COMMENT BUTTON */}
           <button
-            onClick={() => setShowCommentBox(!showCommentBox)}
-            className="text-gray-600 hover:text-green-600"
+            onClick={() => {
+              if (currentUser.trustScore < 20) {
+                alert("Your Trust Score is too low to comment.");
+                return;
+              }
+              setShowCommentBox(!showCommentBox);
+            }}
+            className={`text-gray-600 hover:text-green-600 ${
+              currentUser.trustScore < 20 ? "opacity-50 cursor-not-allowed" : ""
+            }`}
           >
             <svg
               className="w-6 h-6"
@@ -244,14 +249,26 @@ const PostCard = ({
         {showCommentBox && (
           <div className="mt-3 flex items-center gap-2">
             <input
+              disabled={currentUser.trustScore < 20}
               value={commentText}
               onChange={(e) => setCommentText(e.target.value)}
-              placeholder="Add a comment..."
-              className="w-full border rounded-md px-2 py-1 text-sm"
+              placeholder={
+                currentUser.trustScore < 20
+                  ? "Your Trust Score is too low to comment"
+                  : "Add a comment..."
+              }
+              className={`w-full border rounded-md px-2 py-1 text-sm ${
+                currentUser.trustScore < 20 ? "bg-gray-200 cursor-not-allowed" : ""
+              }`}
             />
             <button
+              disabled={currentUser.trustScore < 20}
               onClick={handleComment}
-              className="bg-green-600 text-white rounded-md px-3 py-1 text-sm"
+              className={`rounded-md px-3 py-1 text-sm text-white ${
+                currentUser.trustScore < 20
+                  ? "bg-gray-400 cursor-not-allowed"
+                  : "bg-green-600 hover:bg-green-700"
+              }`}
             >
               Post
             </button>

@@ -43,7 +43,7 @@ const App = () => {
       <Routes>
         <Route path="/login" element={<Login setUser={setUser} />} />
         <Route path="/signup" element={<Signup setUser={setUser} />} />
-        <Route path="/home" element={user ? <Home user={user} /> : <Navigate to="/login" />} />
+        <Route path="/home" element={user ? <Home  /> : <Navigate to="/login" />} />
         <Route path="/profile" element={user ? <Profile user={user} /> : <Navigate to="/login" />} />
         
         {/* 404 Page */}
