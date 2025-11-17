@@ -8,7 +8,10 @@ const userSchema = new mongoose.Schema({
   },
   bio: String,
   password: String,
-
+  trustScore: {
+    type: Number,
+    default: 50, 
+  },
   followers: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
   following: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
 });

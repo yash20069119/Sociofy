@@ -10,6 +10,7 @@ const authenticateUser = (req, res, next) => {
     req.user = decoded; 
     next();
   } catch (err) {
+    alert(err.response?.data?.message || "Failed to load posts");
     return res.status(403).json({ message: "Invalid token" });
   }
 };

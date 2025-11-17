@@ -5,6 +5,7 @@ require("dotenv").config();
 const { authenticateUser } = require("../middleware/authMiddleware");
 
 const router = express.Router();
+const { increaseTrust, decreaseTrust } = require("../utils/trustScore");
 
 
 router.put("/:id", authenticateUser, async (req, res) => {
@@ -72,7 +73,7 @@ router.get("/", async (req, res) => {
 router.post("/:id/follow", authenticateUser, async (req, res) => {
   try {
     const userId = req.user.id;    
-    const targetId = req.params.id; 
+    const targetId = req.params.id;
 
     if (!targetId) return res.status(404).json({ message: "Target user not found" });
 
@@ -80,6 +81,13 @@ router.post("/:id/follow", authenticateUser, async (req, res) => {
     if (user.following.includes(targetId)) {
       return res.status(400).json({ message: "Already following this user" });
     }
+
+    if (user.following.length > 0 && user.following.length % 7 === 0) {
+      await decreaseTrust(userId, 10);
+    }
+
+    await increaseTrust(userId, 1);
+
     await userModel.findByIdAndUpdate(userId, {
       $addToSet: { following: targetId }
     });

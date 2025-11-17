@@ -8,15 +8,16 @@ const userModel = require("./models/user");
 const postRoutes = require("./routes/postRoutes");
 const userRoutes = require("./routes/userRoutes");
 require("dotenv").config();
-
 const app = express();
-app.use(express.json());
-app.use(cookieParser());
- 
+
 app.use(cors({
-  origin: true,
+  origin: "http://localhost:5174",
   credentials: true
 }));
+
+app.use(express.json({ limit: "10mb" }));
+app.use(cookieParser());
+
 
 app.use(express.json({limit: "10mb"}));
 
@@ -48,6 +49,7 @@ app.post("/register", async (req, res) => {
 
     res.status(201).json({ message: "User registered successfully", user: newUser });
   } catch (err) {
+    alert(err.response?.data?.message || "Failed to load posts");
     console.error(err);
     res.status(500).json({ error: "Internal server error" });
   }
@@ -79,7 +81,7 @@ app.post("/login", async (req, res) => {
 
     res.json({ message: "Login successful", user: { name: user.name, email: user.email } });
   } catch (err) {
-    console.error(err);
+    alert(err.response?.data?.message || "Failed to load posts");
     res.status(500).json({ error: "Internal server error" });
   }
 });
@@ -94,6 +96,7 @@ app.get("/profile", async (req, res) => {
     const user = await userModel.findById(decoded.id).select("-password");
     res.json(user);
   } catch (err) {
+    alert(err.response?.data?.message || "Failed to load posts");
     res.status(403).json({ message: "Invalid token" });
   }
 });
@@ -107,3 +110,16 @@ app.post("/logout", (req, res) => {
 app.listen(process.env.PORT, () => {
   console.log(` Server is running on port ${process.env.PORT}`);
 });
+setInterval(async () => {
+  try {
+    const result = await userModel.updateMany(
+      { trustScore: { $lt: 100 } },
+      { $inc: { trustScore: 1 } }   
+    );
+
+    console.log("Daily trust score recovery run:", result.modifiedCount, "users updated");
+  } catch (err) {
+    alert(err.response?.data?.message || "Failed to load posts");
+
+  }
+}, 24 * 60 * 60 * 1000);  

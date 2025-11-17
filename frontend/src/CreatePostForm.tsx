@@ -1,11 +1,9 @@
 import axios from "axios";
 import { useState } from "react";
+import * as interfaces from "./interfaces"
 
-interface setShowCreatePost {
-  setShowCreatePost: (show: boolean) => void;
-}
 
-export default function CreatePostForm( {setShowCreatePost} : setShowCreatePost ) {
+export default function CreatePostForm( {setShowCreatePost} : interfaces.setShowCreatePost ) {
 
 
   const [image, setImage] = useState<string | null>(null);

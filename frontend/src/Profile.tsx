@@ -3,50 +3,55 @@ import Navbar from "./Navbar";
 import CreatePostForm from "./CreatePostForm";
 import axios from "axios";
 import PostCard from "./PostCard";
+import * as interfaces from "./interfaces"
 import EditProfileForm from "./editProfileForm";
-
 import { decodeImage } from "../utils/decodeImage";
 
-const Profile = ({ user, currentUser }) => {
+interface ProfileProps {
+  user: interfaces.User;
+  currentUser?: interfaces.User; // Make optional for when viewing own profile
+}
+
+const Profile = ({ user, currentUser: propCurrentUser }: ProfileProps) => {
   const [activeTab, setActiveTab] = useState("posts");
   const [showCreatePost, setShowCreatePost] = useState(false);
   const [showEditProfile, setShowEditProfile] = useState(false);
-
   const [userPosts, setUserPosts] = useState([]);
-  const [currentUserState, setCurrentUserState] = useState(currentUser);
-
+  
+  // Use propCurrentUser if provided (viewing other profile), otherwise use user (own profile)
+  const [currentUserState, setCurrentUserState] = useState(propCurrentUser || user);
+  const [followers, setFollowers] = useState(user.followers?.length || 0);
+  
+  const isOwnProfile = !propCurrentUser || user._id === propCurrentUser._id;
   const isFollowing = currentUserState.following?.includes(user._id);
-  const [followers, setFollowers] = useState(user.followers.length);
 
-  // Decode profile picture for this user's profile page
+  // Decode profile picture
   const profileImgSrc = decodeImage(user.profilePic);
 
-  // FETCH POSTS OF THIS USER
   useEffect(() => {
     const fetchPosts = async () => {
       try {
         const res = await axios.get(
-          `http://localhost:3000/api/posts/user/${user._id}`,
+          http://localhost:3000/api/posts/user/${user._id},
           { withCredentials: true }
         );
         setUserPosts(res.data);
-      } catch (err) {
+      } catch (err: any) {
         console.error("Error fetching posts:", err);
+        alert(err.response?.data?.message || "Failed to load posts");
       }
     };
-
     fetchPosts();
   }, [showCreatePost, user._id]);
 
   const numberOfPosts = userPosts.length;
 
-  // 🔥 Fetch updated current user after follow/unfollow
+  // Refresh current user data
   const refreshCurrentUser = async () => {
     try {
-      const res = await axios.get(
-        `http://localhost:3000/api/users/${currentUser._id}`,
-        { withCredentials: true }
-      );
+      const res = await axios.get("http://localhost:3000/profile", {
+        withCredentials: true,
+      });
       setCurrentUserState(res.data);
     } catch (err) {
       console.error("Error refreshing user:", err);
@@ -54,42 +59,50 @@ const Profile = ({ user, currentUser }) => {
   };
 
   // FOLLOW USER
-  const handleFollow = async (targetId) => {
+  const handleFollow = async (targetId: string) => {
     try {
-      setFollowers(followers + 1);
+      setFollowers(prev => prev + 1);
       await axios.post(
-        `http://localhost:3000/api/users/${targetId}/follow`,
+        http://localhost:3000/api/users/${targetId}/follow,
         {},
         { withCredentials: true }
       );
-
       await refreshCurrentUser();
-    } catch (err) {
+    } catch (err: any) {
       console.error("Follow error:", err);
+      alert(err.response?.data?.message || "Failed to follow user");
     }
   };
 
   // UNFOLLOW USER
-  const handleUnfollow = async (targetId) => {
+  const handleUnfollow = async (targetId: string) => {
     try {
-      setFollowers(followers - 1);
+      setFollowers(prev => prev - 1);
       await axios.post(
-        `http://localhost:3000/api/users/${targetId}/unfollow`,
+        http://localhost:3000/api/users/${targetId}/unfollow,
         {},
         { withCredentials: true }
       );
-
       await refreshCurrentUser();
-    } catch (err) {
+    } catch (err: any) {
       console.error("Unfollow error:", err);
+      alert(err.response?.data?.message || "Failed to unfollow user");
     }
+  };
+
+  // Function to update trust score (passed to PostCard)
+  const updateTrustScore = (newScore: number) => {
+    setCurrentUserState(prev => ({
+      ...prev,
+      trustScore: newScore
+    }));
   };
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
       <Navbar
         onCreatePostClick={() => setShowCreatePost(false)}
-        currentUser={currentUserState}
+        user={currentUserState}
       />
 
       {/* CREATE POST MODAL */}
@@ -116,8 +129,8 @@ const Profile = ({ user, currentUser }) => {
         </>
       )}
 
-      {/* EDIT PROFILE MODAL */}
-      {showEditProfile && (
+      {/* EDIT PROFILE MODAL - Only show for own profile */}
+      {showEditProfile && isOwnProfile && (
         <>
           <div
             className="fixed inset-0 bg-black/30 backdrop-blur-sm z-40"
@@ -173,7 +186,7 @@ const Profile = ({ user, currentUser }) => {
               <h2 className="text-2xl font-semibold">{user.name}</h2>
 
               {/* FOLLOW / UNFOLLOW / EDIT BUTTON */}
-              {user._id === currentUserState._id ? (
+              {isOwnProfile ? (
                 <button
                   onClick={() => setShowEditProfile(true)}
                   className="px-4 py-1 border border-gray-300 rounded-md text-sm hover:bg-gray-100 transition"
@@ -206,13 +219,16 @@ const Profile = ({ user, currentUser }) => {
                 <span className="font-semibold text-gray-900">{followers}</span> followers
               </p>
               <p>
-                <span className="font-semibold text-gray-900">{user.following.length}</span> following
+                <span className="font-semibold text-gray-900">{user.following?.length || 0}</span> following
+              </p>
+              <p>
+                <span className="font-semibold text-gray-900">{currentUserState.trustScore}</span> trust score
               </p>
             </div>
 
             {/* BIO */}
             <div className="mt-3 text-center text-gray-600 text-sm leading-relaxed">
-              <p className="font-medium text-gray-800">{user.username}</p>
+              <p className="font-medium text-gray-800">{user.name}</p>
               <p>{user.bio || "No bio added yet."}</p>
             </div>
           </div>
@@ -244,7 +260,7 @@ const Profile = ({ user, currentUser }) => {
           {activeTab === "posts" && (
             <>
               {userPosts.length > 0 ? (
-                userPosts.map((post) => (
+                userPosts.map((post: any) => (
                   <PostCard
                     key={post._id}
                     post={{
@@ -258,6 +274,10 @@ const Profile = ({ user, currentUser }) => {
                       _id: post._id,
                     }}
                     currentUser={currentUserState}
+                    setCurrentUser={setCurrentUserState}
+                    handleFollow={handleFollow}
+                    handleUnfollow={handleUnfollow}
+                    refreshUserData={refreshCurrentUser}
                   />
                 ))
               ) : (
