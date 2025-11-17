@@ -42,6 +42,26 @@ router.get("/", async (req, res) => {
   }
 });
 
+
+router.get("/user/:userId", async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    const posts = await postModel
+      .find({ user: userId })
+      .populate("user", "name email")
+      .populate("comments.user", "name email")
+      .sort({ createdAt: -1 });
+
+    res.json(posts);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Error fetching user's posts" });
+  }
+});
+
+
+
 router.post("/:postId/like", authenticateUser, async (req, res) => {
   try {
     const post = await postModel.findById(req.params.postId);
