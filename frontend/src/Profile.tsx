@@ -1,10 +1,32 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Navbar from "./Navbar";
 import CreatePostForm from "./CreatePostForm";
+import axios from "axios";
+import PostCard from "./PostCard";
 
 const Profile = ({user}) => {
   const [activeTab, setActiveTab] = useState("posts");
   const [showCreatePost, setShowCreatePost] = useState(false);
+  const [userPosts, setUserPosts] = useState([]);
+  const followers = user.followers.length;
+  const following = user.following.length;
+
+    useEffect(() => {
+    const fetchPosts = async () => {
+      try {
+        const res = await axios.get(`http://localhost:3000/api/posts/user/${user._id}`, {
+          withCredentials: true,
+        });
+        setUserPosts(res.data);
+      } catch (err) {
+        console.error("Error fetching posts:", err);
+      }
+    };
+    fetchPosts();
+  }, [showCreatePost]);
+
+  console.log("User Posts:", userPosts);
+
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
       <Navbar onCreatePostClick={() => setShowCreatePost(false)} />
@@ -58,10 +80,10 @@ const Profile = ({user}) => {
                 <span className="font-semibold text-gray-900">36</span> posts
               </p>
               <p>
-                <span className="font-semibold text-gray-900">320</span> followers
+                <span className="font-semibold text-gray-900">{followers}</span> followers
               </p>
               <p>
-                <span className="font-semibold text-gray-900">268</span> following
+                <span className="font-semibold text-gray-900">{following}</span> following
               </p>
             </div>
 
@@ -98,14 +120,28 @@ const Profile = ({user}) => {
         <div className="w-full max-w-5xl mt-8 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
           {activeTab === "posts" && (
             <>
-              {[1, 2, 3, 4, 5, 6].map((_, index) => (
-                <div
-                  key={index}
-                  className="aspect-square bg-gray-200 rounded-lg flex items-center justify-center text-gray-500 text-sm"
-                >
-                  Post Image {index + 1}
-                </div>
-              ))}
+                        {/* Post Feed */}
+          {userPosts && userPosts.length > 0 ? (
+            userPosts.map((post) => (
+              <PostCard
+                key={post._id}
+                post={{
+                  user: { username: post.user?.name || "Unknown" },
+                  userId: post.user?._id,
+                  timestamp: new Date(post.createdAt).toLocaleString(),
+                  caption: post.caption,
+                  image: post.image,
+                  likes: post.likes,
+                  comments: post.comments,
+                  _id: post._id,
+                }}
+                currentUser={user}
+
+              />
+            ))
+          ) : (
+            <p className="text-center text-gray-500 mt-6">No posts yet.</p>
+          )}
             </>
           )}
 
