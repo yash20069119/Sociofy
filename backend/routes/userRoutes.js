@@ -7,6 +7,55 @@ const { authenticateUser } = require("../middleware/authMiddleware");
 const router = express.Router();
 
 
+router.put("/:id", authenticateUser, async (req, res) => {
+  try {
+    if (req.user.id !== req.params.id) {
+      return res.status(403).json({ message: "Unauthorized" });
+    }
+
+    const { bio, profilePic } = req.body;
+
+    const updateData = {};
+
+    if (bio !== undefined) updateData.bio = bio;
+
+    // Store Base64 directly as string
+    if (profilePic) {
+      updateData.profilePic = profilePic;
+    }
+
+    const updatedUser = await userModel
+      .findByIdAndUpdate(req.params.id, updateData, { new: true })
+      .select("-password");
+
+    res.json({ user: updatedUser });
+
+  } catch (err) {
+    console.error("UPDATE PROFILE ERROR:", err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+
+
+// GET /api/users/:id
+router.get("/:id", async (req, res) => {
+  try {
+    const user = await userModel.findById(req.params.id).select("-password");
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    res.json(user);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+
+
+
 // GET /api/users
 router.get("/", async (req, res) => {
   try {
