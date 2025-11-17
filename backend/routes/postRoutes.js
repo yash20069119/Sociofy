@@ -35,7 +35,7 @@ router.post("/", authenticateUser, async (req, res) => {
 
 router.get("/", async (req, res) => {
   try {
-    const posts = await postModel.find().populate("user", "name email").populate("comments.user", "name email").sort({ createdAt: -1 });
+    const posts = await postModel.find().populate("user", "name email profilePic").populate("comments.user", "name email profilePic").sort({ createdAt: -1 });
     res.json(posts);
   } catch (err) {
     res.status(500).json({ message: "Error fetching posts", err });
@@ -49,8 +49,8 @@ router.get("/user/:userId", async (req, res) => {
 
     const posts = await postModel
       .find({ user: userId })
-      .populate("user", "name email")
-      .populate("comments.user", "name email")
+      .populate("user", "name email profilePic")
+      .populate("comments.user", "name email profilePic")
       .sort({ createdAt: -1 });
 
     res.json(posts);
