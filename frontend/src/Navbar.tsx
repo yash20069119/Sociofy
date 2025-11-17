@@ -3,9 +3,10 @@ import { useLocation, useNavigate } from "react-router-dom";
 
 interface NavbarProps {
   onCreatePostClick: () => void;
+  currentUser: any;
 }
 
-const Navbar = ({ onCreatePostClick }: NavbarProps) => {
+const Navbar = ({ onCreatePostClick, currentUser }: NavbarProps) => {
   const navigate = useNavigate();
   const location = useLocation();
   const LogOut = () => {
@@ -61,7 +62,7 @@ const Navbar = ({ onCreatePostClick }: NavbarProps) => {
           </button> 
           {/* Profile */}
           <div
-            onClick={() => navigate("/profile")}
+            onClick={() => navigate(`/profile/${currentUser._id}`)}
             className="w-9 h-9 rounded-full bg-green-400 hover:bg-green-500 cursor-pointer border border-green-600"
           ></div>
         </div>

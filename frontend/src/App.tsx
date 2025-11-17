@@ -2,9 +2,10 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-d
 import { useEffect, useState } from "react";
 import axios from "axios";
 import Home from "./Home";
-import Profile from "./Profile";
 import Signup from "./Signup";
 import Login from "./Login";
+import ProfileWrapper from "./ProfileWrapper";
+// import Profile from "./Profile";
 
 axios.defaults.withCredentials = true;
 
@@ -44,7 +45,8 @@ const App = () => {
         <Route path="/login" element={<Login setUser={setUser} />} />
         <Route path="/signup" element={<Signup setUser={setUser} />} />
         <Route path="/home" element={user ? <Home user={user} /> : <Navigate to="/login" />} />
-        <Route path="/profile" element={user ? <Profile user={user} /> : <Navigate to="/login" />} />
+        <Route path="/profile/:id"  element={user ? <ProfileWrapper currentUser={user} /> : <Navigate to="/login" />} />
+        {/* <Route path="/profile" element={user ?<Profile user={user}/> : <Navigate to="/login"/> } /> */}
         
         {/* 404 Page */}
         <Route

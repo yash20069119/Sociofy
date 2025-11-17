@@ -1,9 +1,11 @@
 import { useState } from "react";
 import axios from "axios";
+import { Link } from "react-router-dom";
+import { decodeImage } from "../utils/decodeImage.js"
 
 interface Post {
   _id: string;
-  user: { username: string };
+  user: { username: string, profilePic?: any };
   userId: string;
   timestamp: string;
   caption?: string;
@@ -27,15 +29,18 @@ const PostCard = ({
 
   const [likes, setLikes] = useState(post.likes || []);
   const [comments, setComments] = useState(post.comments || []);
+
   const [showCommentBox, setShowCommentBox] = useState(false);
   const [commentText, setCommentText] = useState("");
 
-  const [liked, setLiked] = useState(false);
-
-  const [showComments, setShowComments] = useState(false);
+  const [liked, setLiked] = useState(
+    Array.isArray(post.likes) && post.likes.includes(currentUser._id)
+  );
 
   const isOwner = currentUser._id === post.userId;
   const isFollowing = currentUser.following?.includes(post.userId);
+
+  const profileImg = decodeImage(post.user?.profilePic);
 
   const handleLike = async () => {
     try {
@@ -44,7 +49,7 @@ const PostCard = ({
       );
 
       setLikes(res.data.likesCount);
-      setLiked(!liked);
+      setLiked(res.data.liked);
     } catch (err) {
       console.log("Like error:", err);
     }
@@ -61,7 +66,6 @@ const PostCard = ({
 
       setComments(res.data.comments);
       setCommentText("");
-      setShowCommentBox(false);
     } catch (err) {
       console.log("Comment error:", err);
     }
@@ -78,11 +82,26 @@ const PostCard = ({
       {/* Header */}
       <div className="flex items-center justify-between p-4">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-full bg-green-500 border border-green-600"></div>
+          <Link to={`/profile/${post.userId}`}>
+            <div className="w-10 h-10 rounded-full overflow-hidden bg-green-200">
+              {profileImg ? (
+                <img
+                  src={profileImg}
+                  alt="User"
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <div className="w-full h-full rounded-full bg-green-500 border border-green-600"></div>
+              )}
+            </div>
+          </Link>
+
           <div>
-            <p className="font-semibold text-gray-800 hover:text-green-600 cursor-pointer">
-              {post.user.username}
-            </p>
+            <Link to={`/profile/${post.userId}`}>
+              <p className="font-semibold text-gray-800 hover:text-green-600 cursor-pointer">
+                {post.user.username}
+              </p>
+            </Link>
             <p className="text-xs text-gray-500">{post.timestamp}</p>
           </div>
         </div>
@@ -159,10 +178,10 @@ const PostCard = ({
       {/* ACTIONS + CAPTION + COMMENTS */}
       <div className="px-4 py-3">
         {/* LIKE + COMMENT */}
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-6">
           <button
             onClick={handleLike}
-            className={`transition-all ${
+            className={`flex items-center gap-1 transition-all ${
               liked ? "text-red-500 scale-110" : "text-gray-600"
             } hover:scale-110`}
           >
@@ -179,12 +198,14 @@ const PostCard = ({
                 d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
               />
             </svg>
+            <span className="text-sm">
+              {likes.length ? likes.length : likes}
+            </span>
           </button>
 
-          {/* COMMENT BUTTON */}
           <button
-            onClick={() => setShowCommentBox(!showCommentBox)}
-            className="text-gray-600 hover:text-green-600"
+            onClick={() => setShowCommentBox(true)}
+            className="flex items-center gap-1 text-gray-600 hover:text-green-600"
           >
             <svg
               className="w-6 h-6"
@@ -199,63 +220,45 @@ const PostCard = ({
                 d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
               />
             </svg>
+            <span className="text-sm">{comments.length}</span>
           </button>
-        </div>
-
-        {/* LIKES + COMMENTS COUNT */}
-        <div className="mt-2 text-sm text-gray-600 flex gap-4">
-          <p>❤️ {likes.length ? likes.length : likes} Likes</p>
-          <p>💬 {comments.length} Comments</p>
         </div>
 
         {/* CAPTION */}
         {post.caption && (
-          <div className="text-sm text-gray-700 mt-1 mb-1">
+          <div className="text-sm text-gray-700 mt-2">
             <span className="font-semibold mr-2">{post.user.username}</span>
             {post.caption}
           </div>
         )}
 
-        {/* SHOW/HIDE COMMENTS */}
-        {comments.length > 0 && (
-          <button
-            onClick={() => setShowComments(!showComments)}
-            className="text-xs text-green-600 mt-1"
-          >
-            {showComments ? "Hide comments" : "Show comments"}
-          </button>
-        )}
-
-        {/* COMMENTS LIST */}
-        {showComments && (
-          <div className="mt-3 space-y-2">
-            {comments.map((c: any, _id: number) => (
-              <div key={c._id} className="text-sm bg-gray-100 rounded-md p-2">
-                <span className="font-semibold">
-                  {c.user?.name || "User"}:{" "}
-                </span>
-                {c.text || c}
-              </div>
-            ))}
-          </div>
-        )}
-
-        {/* COMMENT BOX */}
+        {/* COMMENTS */}
         {showCommentBox && (
-          <div className="mt-3 flex items-center gap-2">
-            <input
-              value={commentText}
-              onChange={(e) => setCommentText(e.target.value)}
-              placeholder="Add a comment..."
-              className="w-full border rounded-md px-2 py-1 text-sm"
-            />
-            <button
-              onClick={handleComment}
-              className="bg-green-600 text-white rounded-md px-3 py-1 text-sm"
-            >
-              Post
-            </button>
-          </div>
+          <>
+            <div className="mt-3 space-y-2">
+              {comments.map((c: any) => (
+                <div key={c._id} className="text-sm bg-gray-100 rounded-md p-2">
+                  <span className="font-semibold">{c.user?.name || "User"}: </span>
+                  {c.text || c}
+                </div>
+              ))}
+            </div>
+
+            <div className="mt-3 flex items-center gap-2">
+              <input
+                value={commentText}
+                onChange={(e) => setCommentText(e.target.value)}
+                placeholder="Add a comment..."
+                className="w-full border rounded-md px-2 py-1 text-sm"
+              />
+              <button
+                onClick={handleComment}
+                className="bg-green-600 text-white rounded-md px-3 py-1 text-sm"
+              >
+                Post
+              </button>
+            </div>
+          </>
         )}
       </div>
     </div>
