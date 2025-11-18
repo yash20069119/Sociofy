@@ -1,8 +1,6 @@
 <div align="center">
 
 #  **Sociofy**
-###  *Course Project Submission*
-
 ---
 
 ###  **Team Members**
@@ -15,31 +13,24 @@
 
 ---
 
-### **Project Overview**
-
-This project, **Sociofy**, is developed as part of the course evaluation.  
-It aims to provide a modern social media web application where users can create posts, view others’ content, and manage their profiles through a responsive and interactive interface.
-
 </div>
 
 ---
 
-##  **Objectives**
-- Develop a functional, user-friendly social media web application  
-- Apply full-stack development principles using React, Node.js, and MongoDB  
-- Integrate and manage database connections using Mongoose  
-- Use Git & GitHub for version control and team collaboration  
+##  **About the project**
+
+It's a lightweight social media web application built using the MERN stack (MongoDB, Express.js, React, Node.js).
+It includes authentication using JWT (stored in HTTP-only cookies), user profiles, posts, feed system, and a basic trust-score mechanism to promote safe interactions.
 
 ---
 
 ##  **Tech Stack**
-
-| Category              | Technologies Used                                |
-| --------------------- | ------------------------------------------------ |
-| **Frontend**          | React.js, Tailwind CSS, JavaScript (ES6+), Axios |
-| **Backend**           | Node.js, Express.js                              |
-| **Database**          | MongoDB, Mongoose                                |
-| **Tools & Utilities** | VS Code, Git, GitHub, Postman, npm               |
+| Category     | Technologies                            |
+| ------------ | --------------------------------------- |
+| **Frontend** | React.js (Vite), Tailwind CSS, Axios    |
+| **Backend**  | Node.js, Express.js                     |
+| **Database** | MongoDB, Mongoose                       |
+| **Tools**    | Git, GitHub, Docker, Postman |
 
 ---
 
@@ -50,7 +41,6 @@ It aims to provide a modern social media web application where users can create 
 -  Profile Management  
 -  Session Handling with Cookies  
 -  Error Handling and Validation  
--  Additional Enhancements (Dark Mode, Feed System)
 
 ---
 
@@ -73,7 +63,7 @@ Sociofy/
 │   │   ├── assets/      # Images and Media
 │   │   └── App.jsx      # Main Application File
 │
-├── report/              # Project Report
+├── docker-compose/      # For running docker installation
 ├── presentation/        # Presentation Slides
 ├── README.md            # This file
 └── package.json         # Dependencies List
@@ -84,9 +74,27 @@ Sociofy/
 
 ##  **Installation & Execution**
 
+## Manual
+
+First setup all the environment files:
+For backend:
+```bash
+MONGO_URL=
+JWT_SECRET=
+PORT=3000
+FRONT_PORT=
+```
+
+For frontend
+
+```bash
+VITE_API_URL=
+VITE_ROOT_URL=
+```
+
 ### 1️⃣ Clone the Repository
 ```bash
-git clone https://github.com/<your-username>/sociofy.git
+git clone https://github.com/Hark-github/sociofy.git
 cd sociofy
 ````
 
@@ -164,7 +172,7 @@ npm run dev
 
 Frontend (Vercel): *Coming Soon*
 Backend (Render / Railway): *Coming Soon*
-GitHub Repository: [https://github.com/<your-username>/sociofy](https://github.com/<your-username>/sociofy)
+GitHub Repository: [https://github.com/Hark-github/sociofy](https://github.com/Hark-github/sociofy)
 
 ---
 
@@ -175,7 +183,7 @@ GitHub Repository: [https://github.com/<your-username>/sociofy](https://github.c
 [harshitkanpal@example.com](mailto:harshitkanpal@example.com)
 [utkarshumap@example.com](mailto:utkarshumap@example.com)
 [yashbhardwaj@example.com](mailto:yashbhardwaj@example.com)
-[GitHub Profile](https://github.com/<your-username>)
+[GitHub Profile](https://github.com/Hark-github)
 
 </div>
  
