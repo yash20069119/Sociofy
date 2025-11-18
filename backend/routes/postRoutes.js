@@ -85,10 +85,8 @@ router.post("/:postId/like", authenticateUser, requireTrust, async (req, res) =>
     const isLiked = post.likes.includes(userId);
 
     if (isLiked) {
-      // Unlike
       post.likes.pull(userId);
     } else {
-      // Like
       post.likes.push(userId);
     }
 
@@ -142,11 +140,9 @@ router.post("/:postId/comment", authenticateUser, requireTrust, async (req, res)
 
     if (duplicateComment) {
       await decreaseTrust(req.user.id, DUPLICATE_COMMENT_PENALTY);
-      pendingRequests.delete(requestKey);
-      return res.status(400).json({ message: "Duplicate comment detected" });
-    }
-
-    await increaseTrust(req.user.id, 1);
+    }else{
+      await increaseTrust(req.user.id, 1)
+    };
 
     post.comments.push({
       user: req.user.id,
