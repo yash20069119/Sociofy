@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import { decodeImage } from "../utils/decodeImage.ts"
 
 import * as interfaces from "./interfaces"
+import CreatePostForm from "./CreatePostForm.tsx";
 
 import api from "./api/axios.ts";
 
@@ -30,6 +31,9 @@ const PostCard = ({
   const [liked, setLiked] = useState(
     Array.isArray(post.likes) && post.likes.includes(currentUser._id)
   );
+
+  const [showEditForm, setShowEditForm] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   const isOwner = currentUser._id === post.userId;
   const isFollowing = currentUser.following?.includes(post.userId);
@@ -71,9 +75,30 @@ const PostCard = ({
     alert("Post link copied to clipboard!");
   };
 
+  const handleDeletePost = async () => {
+    if (deleting) return;
+
+    const confirmed = window.confirm("Are you sure you want to delete this post?");
+    if (!confirmed) return;
+
+    setDeleting(true);
+
+    try {
+      await api.delete(`/posts/${post._id}`);
+
+      alert("Post deleted successfully");
+
+      window.location.reload();
+    } catch (err) {
+      console.log("Delete error:", err);
+      alert("Failed to delete post.");
+    } finally {
+      setDeleting(false);
+    }
+  };
+
   return (
     <div className="rounded-xl border border-gray-200 shadow-sm bg-white absolute overflow-hidden relative">
-      {/* Header */}
       <div className="flex items-center justify-between p-4">
         <div className="flex items-center gap-3">
           <Link to={`/profile/${post.userId}`}>
@@ -100,7 +125,6 @@ const PostCard = ({
           </div>
         </div>
 
-        {/* MENU */}
         <div className="relative">
           <button
             onClick={() => setShowMenu(!showMenu)}
@@ -117,11 +141,18 @@ const PostCard = ({
             <div className="absolute right-0 mt-2 w-36 bg-white rounded-md border shadow-md z-10">
               {isOwner ? (
                 <>
-                  <button className="block px-4 py-2 text-sm hover:bg-green-50 w-full text-left">
+                  <button
+                    className="block px-4 py-2 text-sm hover:bg-green-50 w-full text-left"
+                    onClick={() => setShowEditForm(true)}
+                  >
                     Edit Post
                   </button>
 
-                  <button className="block px-4 py-2 text-sm text-red-600 hover:bg-red-50 w-full text-left border-t">
+                  <button
+                    onClick={handleDeletePost}
+                    disabled={deleting}
+                    className="block px-4 py-2 text-sm text-red-600 hover:bg-red-50 w-full text-left border-t"
+                  >
                     Delete Post
                   </button>
                 </>
@@ -160,7 +191,6 @@ const PostCard = ({
         </div>
       </div>
 
-      {/* Image */}
       {post.image ? (
         <img src={post.image} alt="Post" className="w-full h-80 object-cover" />
       ) : (
@@ -169,9 +199,8 @@ const PostCard = ({
         </div>
       )}
 
-      {/* ACTIONS + CAPTION + COMMENTS */}
       <div className="px-4 py-3">
-        {/* LIKE + COMMENT */}
+
         <div className="flex items-center gap-6">
           <button
             onClick={handleLike}
@@ -226,7 +255,6 @@ const PostCard = ({
           </button>
         </div>
 
-        {/* CAPTION */}
         {post.caption && (
           <div className="text-sm text-gray-700 mt-2">
             <span className="font-semibold mr-2">{post.user.username}</span>
@@ -234,17 +262,18 @@ const PostCard = ({
           </div>
         )}
 
-        {/* COMMENTS */}
         {showCommentBox && (
+          <>
+            <div className="mt-3 space-y-2">
+              {comments.map((c: any) => (
+                <div key={c._id} className="text-sm bg-gray-100 rounded-md p-2">
+                  <span className="font-semibold">{c.user?.name || "User"}: </span>
+                  {c.text || c}
+                </div>
+              ))}
+            </div>
 
-            <><div className="mt-3 space-y-2">
-            {comments.map((c: any) => (
-              <div key={c._id} className="text-sm bg-gray-100 rounded-md p-2">
-                <span className="font-semibold">{c.user?.name || "User"}: </span>
-                {c.text || c}
-              </div>
-            ))}
-          </div><div className="mt-3 flex items-center gap-2">
+            <div className="mt-3 flex items-center gap-2">
               <input
                 disabled={currentUser.trustScore < 20}
                 value={commentText}
@@ -252,19 +281,27 @@ const PostCard = ({
                 placeholder={currentUser.trustScore < 20
                   ? "Your Trust Score is too low to comment"
                   : "Add a comment..."}
-                className={`w-full border rounded-md px-2 py-1 text-sm ${currentUser.trustScore < 20 ? "bg-gray-200 cursor-not-allowed" : ""}`} />
+                className={`w-full border rounded-md px-2 py-1 text-sm ${currentUser.trustScore < 20 ? "bg-gray-200 cursor-not-allowed" : ""}`}
+              />
               <button
                 disabled={currentUser.trustScore < 20}
                 onClick={handleComment}
-                className={`rounded-md px-3 py-1 text-sm text-white ${currentUser.trustScore < 20
+                className={`rounded-md px-3 py-1 text-sm text-white ${
+                  currentUser.trustScore < 20
                     ? "bg-gray-400 cursor-not-allowed"
-                    : "bg-green-600 hover:bg-green-700"}`}
+                    : "bg-green-600 hover:bg-green-700"
+                }`}
               >
                 Post
               </button>
-            </div></>
+            </div>
+          </>
         )}
       </div>
+
+      {showEditForm && (
+        <CreatePostForm setShowCreatePost={setShowEditForm} postToEdit={post}  />
+      )}
     </div>
   );
 };
