@@ -51,7 +51,7 @@ router.post("/", authenticateUser, requireTrust, async (req, res) => {
 
 router.get("/", async (req, res) => {
   try {
-    const posts = await postModel.find().populate("user", "name email").populate("comments.user", "name email").sort({ createdAt: -1 });
+    const posts = await postModel.find().populate("user", "name email profilePic").populate("comments.user", "name email").sort({ createdAt: -1 });
     res.json(posts);
   } catch (err) {
     res.status(500).json({ message: "Error fetching posts", err });
@@ -75,6 +75,49 @@ router.get("/user/:userId", async (req, res) => {
     res.status(500).json({ message: "Error fetching user's posts" });
   }
 });
+
+
+router.put("/:postId", authenticateUser, requireTrust, async (req, res) => {
+  try {
+    const { caption, image } = req.body;
+
+    const post = await postModel.findById(req.params.postId);
+    if (!post) return res.status(404).json({ message: "Post not found" });
+
+    if (post.user.toString() !== req.user.id) {
+      return res.status(403).json({ message: "Not authorized to edit this post" });
+    }
+
+    if (caption !== undefined) post.caption = caption;
+    if (image !== undefined) post.image = image;
+
+    await post.save();
+
+    res.json({ message: "Post updated successfully", post });
+  } catch (err) {
+    res.status(500).json({ message: "Error updating post", err });
+  }
+});
+
+
+router.delete("/:postId", authenticateUser, requireTrust, async (req, res) => {
+  try {
+    const post = await postModel.findById(req.params.postId);
+    if (!post) return res.status(404).json({ message: "Post not found" });
+
+    if (post.user.toString() !== req.user.id) {
+      return res.status(403).json({ message: "Not authorized to delete this post" });
+    }
+
+    await post.deleteOne();
+
+    res.json({ message: "Post deleted successfully" });
+  } catch (err) {
+    res.status(500).json({ message: "Error deleting post", err });
+  }
+});
+
+
 
 router.post("/:postId/like", authenticateUser, requireTrust, async (req, res) => {
   try {
