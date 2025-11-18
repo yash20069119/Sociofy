@@ -1,7 +1,9 @@
-import axios from "axios";
+
 import { useLocation, useNavigate } from "react-router-dom";
 import * as interfaces from "./interfaces"
 import { useEffect, useState } from "react";
+
+import rootClient from "./api/rootClient";
 
 
 const Navbar = ({ onCreatePostClick, user }: interfaces.NavbarProps) => {
@@ -9,8 +11,8 @@ const Navbar = ({ onCreatePostClick, user }: interfaces.NavbarProps) => {
   const location = useLocation();
   const [currentUser, setCurrentUser] = useState(user);
   const LogOut = () => {
-    axios
-      .post("http://localhost:3000/logout", {}, { withCredentials: true })
+    rootClient
+      .post("/logout", {})
       .then(() => {
         console.log("Logged out");
         navigate("/login");
@@ -21,7 +23,7 @@ const Navbar = ({ onCreatePostClick, user }: interfaces.NavbarProps) => {
   };
   useEffect(() => {
     const interval = setInterval(() => {
-      axios.get("http://localhost:3000/profile", { withCredentials: true })
+      rootClient.get("/profile")
         .then(res => setCurrentUser(res.data))
         .catch(err => console.error("Error refreshing user:", err));
     }, 10000);

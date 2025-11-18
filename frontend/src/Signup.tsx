@@ -1,6 +1,7 @@
-import axios from "axios";
+
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import rootClient from "./api/rootClient";
 
 const Signup = ({setUser}) => {
   const [showPassword, setShowPassword] = useState(false);
@@ -10,8 +11,8 @@ const Signup = ({setUser}) => {
   const navigate = useNavigate();
   const handleSubmit = (e) => {
     e.preventDefault();
-    axios
-      .post("http://localhost:3000/register", { name, email, password })
+    rootClient
+      .post("/register", { name, email, password })
       .then((res) => {console.log(res);navigate("/login")})
       .catch((err) => console.log(err));
   };

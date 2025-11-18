@@ -1,5 +1,6 @@
 import { useState } from "react";
-import axios from "axios";
+
+import api from "./api/axios.ts";
 
 const EditProfileForm = ({ currentUser, onUpdate }) => {
   const [bio, setBio] = useState(currentUser.bio || "");
@@ -26,13 +27,12 @@ const EditProfileForm = ({ currentUser, onUpdate }) => {
     setLoading(true);
 
     try {
-      const res = await axios.put(
-        `http://localhost:3000/api/users/${currentUser._id}`,
+      const res = await api.put(
+        `/users/${currentUser._id}`,
         {
           bio,
           profilePic: profilePicBase64
-        },
-        { withCredentials: true }
+        }
       );
 
       onUpdate(res.data.user);

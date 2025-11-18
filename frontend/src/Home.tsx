@@ -1,10 +1,13 @@
 import { useState, useEffect } from "react";
-import axios from "axios";
+
 import CreatePostForm from "./CreatePostForm";
 import PostCard from "./PostCard";
 import Navbar from "./Navbar";
-import { decodeImage } from "../utils/decodeImage";
+import { decodeImage } from "../utils/decodeImage.ts";
 import * as interfaces from "./interfaces"
+
+import api from "./api/axios.ts";
+import rootClient from "./api/rootClient.ts";
 
 const Home = ({user}:interfaces.Homeele) => {
   const [showCreatePost, setShowCreatePost] = useState(false);
@@ -18,9 +21,7 @@ const Home = ({user}:interfaces.Homeele) => {
   useEffect(() => {
     const fetchCurrentUser = async () => {
       try {
-        const res = await axios.get("http://localhost:3000/profile", {
-          withCredentials: true,
-        });
+        const res = await rootClient.get("/profile");
         setCurrentUser(res.data);
       } catch (err) {
         console.error("Error fetching current user:", err);
@@ -36,9 +37,7 @@ const Home = ({user}:interfaces.Homeele) => {
     const fetchPosts = async () => {
       try {
         setLoadingPosts(true);
-        const res = await axios.get("http://localhost:3000/api/posts", {
-          withCredentials: true,
-        });
+        const res = await api.get("/posts");
         setPosts(res.data);
       } catch (err) {
         alert(err.response?.data?.message || "Failed to load posts");
@@ -53,7 +52,7 @@ const Home = ({user}:interfaces.Homeele) => {
   useEffect(() => {
     const fetchSuggestions = async () => {
       try {
-        const res = await axios.get("http://localhost:3000/api/users/");
+        const res = await api.get("/users/");
         setSuggestions(res.data);
       } catch (err) {
           alert(err.response?.data?.message || "Failed to load posts");
@@ -65,11 +64,7 @@ const Home = ({user}:interfaces.Homeele) => {
 
   const handleFollow = async (targetId) => {
     try {
-      await axios.post(
-        `http://localhost:3000/api/users/${targetId}/follow`,
-        {},
-        { withCredentials: true }
-      );
+      await api.post(`/users/${targetId}/follow`, {});
 
       setCurrentUser((prev) => ({
         ...prev,
@@ -83,11 +78,7 @@ const Home = ({user}:interfaces.Homeele) => {
 
   const handleUnfollow = async (targetId) => {
     try {
-      await axios.post(
-        `http://localhost:3000/api/users/${targetId}/unfollow`,
-        {},
-        { withCredentials: true }
-      );
+      await api.post(`/users/${targetId}/unfollow`,{});
 
       setCurrentUser((prev) => ({
         ...prev,

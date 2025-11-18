@@ -1,11 +1,13 @@
 import { useState, useEffect } from "react";
 import Navbar from "./Navbar";
 import CreatePostForm from "./CreatePostForm";
-import axios from "axios";
 import PostCard from "./PostCard";
 import * as interfaces from "./interfaces"
-import EditProfileForm from "./editProfileForm";
-import { decodeImage } from "../utils/decodeImage";
+import EditProfileForm from "./EditProfileForm.tsx";
+import { decodeImage } from "../utils/decodeImage.ts";
+
+import api from "./api/axios.ts";
+import rootClient from "./api/rootClient.js";
 
 interface ProfileProps {
   user: interfaces.User;
@@ -31,10 +33,7 @@ const Profile = ({ user, currentUser: propCurrentUser }: ProfileProps) => {
   useEffect(() => {
     const fetchPosts = async () => {
       try {
-        const res = await axios.get(
-          http://localhost:3000/api/posts/user/${user._id},
-          { withCredentials: true }
-        );
+        const res = await api.get(`/posts/user/${user._id}`);
         setUserPosts(res.data);
       } catch (err: any) {
         console.error("Error fetching posts:", err);
@@ -49,9 +48,7 @@ const Profile = ({ user, currentUser: propCurrentUser }: ProfileProps) => {
   // Refresh current user data
   const refreshCurrentUser = async () => {
     try {
-      const res = await axios.get("http://localhost:3000/profile", {
-        withCredentials: true,
-      });
+      const res = await rootClient.get("/profile");
       setCurrentUserState(res.data);
     } catch (err) {
       console.error("Error refreshing user:", err);
@@ -62,11 +59,7 @@ const Profile = ({ user, currentUser: propCurrentUser }: ProfileProps) => {
   const handleFollow = async (targetId: string) => {
     try {
       setFollowers(prev => prev + 1);
-      await axios.post(
-        http://localhost:3000/api/users/${targetId}/follow,
-        {},
-        { withCredentials: true }
-      );
+      await api.post(`/users/${targetId}/follow`,{});
       await refreshCurrentUser();
     } catch (err: any) {
       console.error("Follow error:", err);
@@ -78,10 +71,9 @@ const Profile = ({ user, currentUser: propCurrentUser }: ProfileProps) => {
   const handleUnfollow = async (targetId: string) => {
     try {
       setFollowers(prev => prev - 1);
-      await axios.post(
-        http://localhost:3000/api/users/${targetId}/unfollow,
+      await api.post(
+        `/users/${targetId}/unfollow`,
         {},
-        { withCredentials: true }
       );
       await refreshCurrentUser();
     } catch (err: any) {

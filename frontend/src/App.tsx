@@ -1,13 +1,15 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import { useEffect, useState } from "react";
-import axios from "axios";
 import Home from "./Home";
 import Signup from "./Signup";
 import Login from "./Login";
 import ProfileWrapper from "./ProfileWrapper";
 // import Profile from "./Profile";
 
-axios.defaults.withCredentials = true;
+import rootClient from "./api/rootClient";
+
+
+
 
 const App = () => {
   const [user, setUser] = useState({
@@ -20,8 +22,8 @@ const App = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    axios
-      .get("http://localhost:3000/profile", { withCredentials: true })
+    rootClient
+      .get("/profile")
       .then((res) => {
         setUser(res.data);
         setLoading(false);

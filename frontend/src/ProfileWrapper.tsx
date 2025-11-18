@@ -1,14 +1,16 @@
 import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
-import axios from "axios";
+
 import Profile from "./Profile";
+
+import api from "./api/axios.ts";
 
 const ProfileWrapper = ({ currentUser }) => {
   const { id } = useParams();
   const [profileUser, setProfileUser] = useState(null);
 
   useEffect(() => {
-    axios.get(`http://localhost:3000/api/users/${id}`)
+    api.get(`/users/${id}`)
       .then((res) => setProfileUser(res.data))
       .catch(() => setProfileUser(null));
   }, [id]);

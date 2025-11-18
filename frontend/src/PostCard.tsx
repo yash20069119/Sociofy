@@ -1,9 +1,11 @@
 import { useState } from "react";
-import axios from "axios";
+
 import { Link } from "react-router-dom";
-import { decodeImage } from "../utils/decodeImage.js"
+import { decodeImage } from "../utils/decodeImage.ts"
 
 import * as interfaces from "./interfaces"
+
+import api from "./api/axios.ts";
 
 
 const PostCard = ({
@@ -36,9 +38,7 @@ const PostCard = ({
 
   const handleLike = async () => {
     try {
-      const res = await axios.post(
-        `http://localhost:3000/api/posts/${post._id}/like`
-      );
+      const res = await api.post(`/posts/${post._id}/like`);
 
       setLikes(res.data.likesCount);
       setLiked(res.data.liked);
@@ -56,10 +56,7 @@ const PostCard = ({
     if (!commentText.trim()) return;
 
     try {
-      const res = await axios.post(
-        `http://localhost:3000/api/posts/${post._id}/comment`,
-        { text: commentText }
-      );
+      const res = await api.post(`/posts/${post._id}/comment`,{ text: commentText });
 
       setComments(res.data.comments);
       setCommentText("");

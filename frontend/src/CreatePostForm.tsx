@@ -1,9 +1,11 @@
-import axios from "axios";
+
 import { useState } from "react";
 import * as interfaces from "./interfaces"
 
+import api from "./api/axios.ts"
 
-export default function CreatePostForm( {setShowCreatePost} : interfaces.setShowCreatePost ) {
+
+export default function CreatePostForm({ setShowCreatePost }: interfaces.setShowCreatePost) {
 
 
   const [image, setImage] = useState<string | null>(null);
@@ -23,36 +25,34 @@ export default function CreatePostForm( {setShowCreatePost} : interfaces.setShow
 
 
   const handleSubmit = async () => {
-  if (!image) {
-    alert("Please select an image first.");
-    return;
-  }
+    if (!image) {
+      alert("Please select an image first.");
+      return;
+    }
 
-  try {
-    setLoading(true);
+    try {
+      setLoading(true);
 
-    const response = await axios.post(
-      "http://localhost:3000/api/posts/",
-      { image, caption },
-      {
-        withCredentials: true, 
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
-    );
+      const response = await api.post(
+        "/posts/",
+        { image, caption },
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      console.log("Post uploaded successfully:", response.data);
+      alert("Post uploaded successfully!");
 
-    console.log("Post uploaded successfully:", response.data);
-    alert("Post uploaded successfully!");
-
-    setShowCreatePost(false);
-  } catch (error) {
-    console.error("Error uploading post:", error);
-    alert("Failed to upload post.");
-  } finally {
-    setLoading(false);
-  }
-};
+      setShowCreatePost(false);
+    } catch (error) {
+      console.error("Error uploading post:", error);
+      alert("Failed to upload post.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
 
 
@@ -128,7 +128,7 @@ export default function CreatePostForm( {setShowCreatePost} : interfaces.setShow
               rows={3}
               placeholder="Write a caption..."
               value={caption}
-              onChange={(e)=> setCaption(e.target.value)}
+              onChange={(e) => setCaption(e.target.value)}
               className="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-pink-500"
             />
           </div>
@@ -143,9 +143,8 @@ export default function CreatePostForm( {setShowCreatePost} : interfaces.setShow
           <button
             onClick={handleSubmit}
             disabled={loading}
-            className={`${
-              loading ? "opacity-70 cursor-not-allowed" : "hover:opacity-90"
-            } bg-gradient-to-r from-purple-600 to-pink-500 text-white px-6 py-2 rounded-md font-medium`}
+            className={`${loading ? "opacity-70 cursor-not-allowed" : "hover:opacity-90"
+              } bg-gradient-to-r from-purple-600 to-pink-500 text-white px-6 py-2 rounded-md font-medium`}
           >
             {loading ? "Sharing..." : "Share Post"}
           </button>
