@@ -1,0 +1,36 @@
+services:
+  mongo:
+    image: mongo:latest
+    container_name: sociofy-mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - ./mongo_data:/data/db
+  backend:
+    build: ./backend
+    container_name: sociofy-backend
+    restart: always
+    environment:
+      - PORT=3000
+      - MONGO_URL=mongodb://mongo:27017/sociofy
+      - JWT_SECRET=84b75cd75eedb4b986c1cd6307771055645d8b55de075a4eec224d79c26f1eed
+      - FRONT_PORT=172.22.0.4:5173
+    ports:
+      - "3000:3000"
+    depends_on:
+      - mongo
+
+  frontend:
+    build: ./frontend
+    container_name: sociofy-frontend
+    restart: always
+    ports:
+      - "5174:5174"
+    environment:
+      - VITE_API_URL=http://localhost:3000/api
+      - VITE_ROOT_URL=http://localhost:3000
+    depends_on:
+      - backend
+
+volumes:
+  mongo_data:

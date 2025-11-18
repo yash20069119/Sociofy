@@ -8,6 +8,7 @@ import * as interfaces from "./interfaces"
 
 import api from "./api/axios.ts";
 import rootClient from "./api/rootClient.ts";
+import { Navigate } from "react-router-dom";
 
 const Home = ({user}:interfaces.Homeele) => {
   const [showCreatePost, setShowCreatePost] = useState(false);
@@ -17,7 +18,6 @@ const Home = ({user}:interfaces.Homeele) => {
 
   const [currentUser, setCurrentUser] = useState(user);
   const [loading, setLoading] = useState(true);
-
   useEffect(() => {
     const fetchCurrentUser = async () => {
       try {
@@ -89,8 +89,8 @@ const Home = ({user}:interfaces.Homeele) => {
       console.error("Unfollow error:", err);
     }
   };
-
-  if (loading || !currentUser) {
+  
+  if (loading && !currentUser) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
@@ -100,7 +100,11 @@ const Home = ({user}:interfaces.Homeele) => {
       </div>
     );
   }
-
+  if(!currentUser){
+    return (
+      <Navigate to={"/login"}/>
+    )
+  }
   return (
     <div className="relative w-full min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 overflow-hidden">
       <Navbar onCreatePostClick={() => setShowCreatePost(true)}  user={currentUser}/>
@@ -118,8 +122,8 @@ const Home = ({user}:interfaces.Homeele) => {
             </h3>
             <div className="space-y-4">
               {suggestions
-                .filter((u) => u._id !== currentUser._id)
-                .map((u) => {
+                .filter((u:interfaces.User) => u._id !== currentUser._id)
+                .map((u:interfaces.User) => {
                   const isFollowing = currentUser.following?.includes(u._id);
                   return (
                     <div key={u._id} className="flex items-center justify-between group">
@@ -196,7 +200,7 @@ const Home = ({user}:interfaces.Homeele) => {
               <div className="w-10 h-10 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin"></div>
             </div>
           ) : posts && posts.length > 0 ? (
-            posts.map((post) => (
+            posts.map((post:interfaces.Post) => (
              <PostCard
                 key={post._id}
                 post={{
@@ -242,7 +246,7 @@ const Home = ({user}:interfaces.Homeele) => {
 
             {suggestions
               .filter((u) => u._id !== currentUser._id) 
-              .map((u) => {
+              .map((u:interfaces.User) => {
                 const isFollowing = currentUser.following?.includes(u._id);
                 const profileImg = decodeImage(u.profilePic);  
 

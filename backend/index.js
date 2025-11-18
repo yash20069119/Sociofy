@@ -10,10 +10,13 @@ const userRoutes = require("./routes/userRoutes");
 require("dotenv").config();
 const app = express();
 
-app.use(cors({
-  origin: "http://localhost:5173",
-  credentials: true
-}));
+app.use(
+  cors({
+    origin: ["http://localhost:5173", "http://172.22.0.4:5173"],
+    credentials: true,
+  })
+);
+app.set("trust proxy", 1);
 
 app.use(express.json({ limit: "10mb" }));
 app.use(cookieParser());
@@ -49,7 +52,6 @@ app.post("/register", async (req, res) => {
 
     res.status(201).json({ message: "User registered successfully", user: newUser });
   } catch (err) {
-    alert(err.response?.data?.message || "Failed to load posts");
     console.error(err);
     res.status(500).json({ error: "Internal server error" });
   }
@@ -74,14 +76,15 @@ app.post("/login", async (req, res) => {
 
     res.cookie("token", token, {
       httpOnly: true,
-      secure: false,
-      sameSite: "lax",
+      secure: true,      
+      sameSite: "none",   
+      path: "/",       
       maxAge: 24 * 60 * 60 * 1000
     });
 
+
     res.json({ message: "Login successful", user: { name: user.name, email: user.email } });
   } catch (err) {
-    alert(err.response?.data?.message || "Failed to load posts");
     res.status(500).json({ error: "Internal server error" });
   }
 });
@@ -96,14 +99,18 @@ app.get("/profile", async (req, res) => {
     const user = await userModel.findById(decoded.id).select("-password");
     res.json(user);
   } catch (err) {
-    alert(err.response?.data?.message || "Failed to load posts");
     res.status(403).json({ message: "Invalid token" });
   }
 });
 
 // LOGOUT
 app.post("/logout", (req, res) => {
-  res.clearCookie("token");
+  res.clearCookie("token", {
+  path: "/",
+  sameSite: "none",
+  secure: true
+});
+
   res.json({ message: "Logged out successfully" });
 });
 
@@ -119,7 +126,6 @@ setInterval(async () => {
 
     console.log("Daily trust score recovery run:", result.modifiedCount, "users updated");
   } catch (err) {
-    alert(err.response?.data?.message || "Failed to load posts");
 
   }
 }, 24 * 60 * 60 * 1000);  

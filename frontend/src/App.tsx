@@ -5,26 +5,21 @@ import Signup from "./Signup";
 import Login from "./Login";
 import ProfileWrapper from "./ProfileWrapper";
 // import Profile from "./Profile";
-
+import * as interfaces from "./interfaces"
 import rootClient from "./api/rootClient";
 
 
 
 
 const App = () => {
-  const [user, setUser] = useState({
-    _id: "null",
-    name: "null",
-    email: "null@gmail.com",
-    __v: 0,
-  }); 
-
+const [user, setUser] = useState<interfaces.User | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     rootClient
       .get("/profile")
       .then((res) => {
+        console.log("fucxzs",res.data)
         setUser(res.data);
         setLoading(false);
       })
@@ -49,10 +44,10 @@ const App = () => {
         <Route path="/home" element={user ? <Home user={user} /> : <Navigate to="/login" />} />
         <Route path="/profile/:id"  element={user ? <ProfileWrapper currentUser={user} /> : <Navigate to="/login" />} />
         {/* <Route path="/profile" element={user ?<Profile user={user}/> : <Navigate to="/login"/> } /> */}
-        
+        <Route path="/" element={<Navigate to="/login" />}/>
         {/* 404 Page */}
         <Route
-          path="*"
+          path="/*"
           element={
             <h1 className="text-center mt-10 text-2xl text-gray-700">
               404 - Page Not Found

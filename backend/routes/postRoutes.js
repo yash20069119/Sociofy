@@ -42,20 +42,18 @@ router.post("/", authenticateUser, requireTrust, async (req, res) => {
 
     res.status(201).json({ message: "Post created successfully", post: newPost });
   } catch (err) {
-            alert(err.response?.data?.message || "Failed to load posts");
 
     console.error(err);
     res.status(500).json({ message: "Error creating post" });
   }
 });
 
+
 router.get("/", async (req, res) => {
   try {
-    const posts = await postModel.find().populate("user", "name email profilePic").populate("comments.user", "name email profilePic").sort({ createdAt: -1 });
+    const posts = await postModel.find().populate("user", "name email").populate("comments.user", "name email").sort({ createdAt: -1 });
     res.json(posts);
   } catch (err) {
-            alert(err.response?.data?.message || "Failed to load posts");
-
     res.status(500).json({ message: "Error fetching posts", err });
   }
 });
@@ -72,7 +70,6 @@ router.get("/user/:userId", async (req, res) => {
 
     res.json(posts);
   } catch (err) {
-            alert(err.response?.data?.message || "Failed to load posts");
 
     console.error(err);
     res.status(500).json({ message: "Error fetching user's posts" });
@@ -98,7 +95,6 @@ router.post("/:postId/like", authenticateUser, requireTrust, async (req, res) =>
     await post.save();
     res.json({ likesCount: post.likes.length, liked: !isLiked });
   } catch (err) {
-            alert(err.response?.data?.message || "Failed to load posts");
 
     res.status(500).json({ message: "Error liking post", err });
   }
@@ -166,7 +162,6 @@ router.post("/:postId/comment", authenticateUser, requireTrust, async (req, res)
 
     res.status(201).json(populatedPost);
   } catch (err) {
-            alert(err.response?.data?.message || "Failed to load posts");
 
     res.status(500).json({ message: "Error adding comment", err });
   } finally {

@@ -9,8 +9,7 @@ const authenticateUser = (req, res, next) => {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     req.user = decoded; 
     next();
-  } catch (err) {
-    alert(err.response?.data?.message || "Failed to load posts");
+  } catch (err) { 
     return res.status(403).json({ message: "Invalid token" });
   }
 };
