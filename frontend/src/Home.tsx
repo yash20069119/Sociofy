@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-
+import { Link } from "react-router-dom";
 import CreatePostForm from "./CreatePostForm";
 import PostCard from "./PostCard";
 import Navbar from "./Navbar";
@@ -94,7 +94,7 @@ const Home = ({user}:interfaces.Homeele) => {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto"></div>
           <p className="mt-4 text-gray-600">Loading...</p>
         </div>
       </div>
@@ -128,7 +128,7 @@ const Home = ({user}:interfaces.Homeele) => {
                   return (
                     <div key={u._id} className="flex items-center justify-between group">
                       <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-300 to-pink-300"></div>
+                        <div className="w-10 h-10 rounded-full  bg-green-500 border border-green-600"></div>
                         <div>
                           <p className="font-semibold text-gray-700 text-sm">{u.name}</p>
                           <p className="text-xs text-gray-400">{u.email}</p>
@@ -144,7 +144,7 @@ const Home = ({user}:interfaces.Homeele) => {
                     ) : (
                       <button
                         onClick={() => handleFollow(u._id)}
-                        className="text-sm text-indigo-600 hover:text-indigo-700 font-semibold hover:scale-105 transition-transform"
+                        className="text-sm text-green-600 hover:text-green-700 font-semibold hover:scale-105 transition-transform"
                       >
                         Follow
                       </button>
@@ -161,8 +161,8 @@ const Home = ({user}:interfaces.Homeele) => {
             className="bg-white rounded-2xl shadow-sm p-4 border border-gray-100 cursor-pointer hover:shadow transition"
           >
             <div className="flex items-center gap-3 p-3 hover:bg-gray-50 rounded-xl transition-colors">
-              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-400 to-pink-400"></div>
-              <span className="flex-1 text-left text-gray-500">What's on your mind?</span>
+              <div className="w-10 h-10 rounded-full  bg-green-500 border border-green-600"></div>
+              <span className="flex-1 text-left text-gray-500">Any Updates for today?</span>
               <svg className="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
                   strokeLinecap="round"
@@ -197,7 +197,7 @@ const Home = ({user}:interfaces.Homeele) => {
 
           {loadingPosts ? (
             <div className="flex justify-center py-10">
-              <div className="w-10 h-10 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin"></div>
+              <div className="w-10 h-10 border-4 border-green-500 border-t-transparent rounded-full animate-spin"></div>
             </div>
           ) : posts && posts.length > 0 ? (
             posts.map((post:interfaces.Post) => (
@@ -232,13 +232,15 @@ const Home = ({user}:interfaces.Homeele) => {
         {/* Desktop Sidebar - Hidden on mobile, sticky on desktop */}
         <aside className="hidden lg:block w-80 space-y-6 order-1 lg:order-2">
           <div className="bg-white rounded-2xl shadow-sm p-5 border border-gray-100 sticky top-24">
+            <Link to={`/profile/${currentUser._id}`}>
             <div className="flex items-center gap-3 mb-6 pb-6 border-b border-gray-100">
-              <div className="w-14 h-14 rounded-full bg-gradient-to-br from-indigo-400 to-pink-400 hover:scale-105 transition-transform cursor-pointer"></div>
+              <div className="w-14 h-14 rounded-full  bg-green-500 border border-green-600 hover:scale-105 transition-transform cursor-pointer"></div>
               <div>
                 <p className="font-bold text-gray-900">{currentUser.name}</p>
                 <p className="text-sm text-gray-500">@{currentUser.name}</p>
               </div>
             </div>
+            </Link>
 
             <h3 className="font-bold text-gray-800 mb-4 text-sm uppercase tracking-wide">
               Suggested for you
@@ -263,7 +265,7 @@ const Home = ({user}:interfaces.Homeele) => {
                             className="w-full h-full object-cover"
                           />
                         ) : (
-                          <div className="w-full h-full rounded-full bg-gradient-to-br from-indigo-300 to-pink-300"></div>
+                          <div className="w-full h-full rounded-full  bg-green-500 border border-green-600"></div>
                         )}
                       </div>
 
@@ -304,7 +306,7 @@ const Home = ({user}:interfaces.Homeele) => {
       {/* Floating Create Button */}
       <button
         onClick={() => setShowCreatePost(true)}
-        className="fixed bottom-8 right-8 lg:hidden w-16 h-16 bg-gradient-to-r from-indigo-600 to-pink-600 text-white rounded-full shadow-2xl flex items-center justify-center transform hover:scale-110 transition-all z-50"
+        className="fixed bottom-8 right-8 lg:hidden w-16 h-16  bg-green-500 border border-green-600 text-white rounded-full shadow-2xl flex items-center justify-center transform hover:scale-110 transition-all z-50"
       >
         <svg className="w-8 h-8" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
