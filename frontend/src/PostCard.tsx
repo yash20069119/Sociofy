@@ -1,134 +1,35 @@
 import { useState } from "react";
 
-import { Link } from "react-router-dom";
-import { decodeImage } from "../utils/decodeImage.ts"
+interface Post {
+  user: {
+    username: string;
+  };
+  timestamp: string;
+  caption?: string;
+}
 
-import * as interfaces from "./interfaces"
-import CreatePostForm from "./CreatePostForm.tsx";
-
-import api from "./api/axios.ts";
-
-
-const PostCard = ({
-  post,
-  currentUser,
-  handleFollow,
-  handleUnfollow,
-}: {
-  post: interfaces.Post;
-  currentUser: any;
-  handleFollow: (id: string) => void;
-  handleUnfollow: (id: string) => void;
-}) => {
+const PostCard = ({ post }: { post: Post }) => {
   const [showMenu, setShowMenu] = useState(false);
 
-  const [likes, setLikes] = useState(post.likes || []);
-  const [comments, setComments] = useState(post.comments || []);
-
-  const [showCommentBox, setShowCommentBox] = useState(false);
-  const [commentText, setCommentText] = useState("");
-
-  const [liked, setLiked] = useState(
-    Array.isArray(post.likes) && post.likes.includes(currentUser._id)
-  );
-
-  const [showEditForm, setShowEditForm] = useState(false);
-  const [deleting, setDeleting] = useState(false);
-
-  const isOwner = currentUser._id === post.userId;
-  const isFollowing = currentUser.following?.includes(post.userId);
-
-  const profileImg = decodeImage(post.user?.profilePic);
-
-  const handleLike = async () => {
-    try {
-      const res = await api.post(`/posts/${post._id}/like`);
-
-      setLikes(res.data.likesCount);
-      setLiked(res.data.liked);
-    } catch (err) {
-      console.log("Like error:", err);
-    }
-  };
-
-  const handleComment = async () => {
-    if (currentUser.trustScore < 20) {
-      alert("Your Trust Score is too low to comment.");
-      return;
-    }
-
-    if (!commentText.trim()) return;
-
-    try {
-      const res = await api.post(`/posts/${post._id}/comment`,{ text: commentText });
-
-      setComments(res.data.comments);
-      setCommentText("");
-    } catch (err) {
-      console.log("Comment error:", err);
-    }
-  };
-
-  const handleShare = async () => {
-    const url = `${window.location.origin}/post/${post._id}`;
-    await navigator.clipboard.writeText(url);
-    alert("Post link copied to clipboard!");
-  };
-
-  const handleDeletePost = async () => {
-    if (deleting) return;
-
-    const confirmed = window.confirm("Are you sure you want to delete this post?");
-    if (!confirmed) return;
-
-    setDeleting(true);
-
-    try {
-      await api.delete(`/posts/${post._id}`);
-
-      alert("Post deleted successfully");
-
-      window.location.reload();
-    } catch (err) {
-      console.log("Delete error:", err);
-      alert("Failed to delete post.");
-    } finally {
-      setDeleting(false);
-    }
-  };
-
   return (
-    <div className="rounded-xl border border-gray-200 shadow-sm bg-white absolute overflow-hidden relative">
+    <div className="bg-white rounded-2xl shadow-sm hover:shadow-md transition-shadow overflow-hidden border border-gray-100 relative">
+      {/* Header */}
       <div className="flex items-center justify-between p-4">
         <div className="flex items-center gap-3">
-          <Link to={`/profile/${post.userId}`}>
-            <div className="w-10 h-10 rounded-full overflow-hidden bg-green-200">
-              {profileImg ? (
-                <img
-                  src={profileImg}
-                  alt="User"
-                  className="w-full h-full object-cover"
-                />
-              ) : (
-                <div className="w-full h-full rounded-full bg-green-500 border border-green-600"></div>
-              )}
-            </div>
-          </Link>
-
+          <div className="w-11 h-11 rounded-full border-2  bg-green-500 border border-green-600 hover:scale-105 transition-transform cursor-pointer"></div>
           <div>
-            <Link to={`/profile/${post.userId}`}>
-              <p className="font-semibold text-gray-800 hover:text-green-600 cursor-pointer">
-                {post.user.username}
-              </p>
-            </Link>
+            <p className="font-semibold text-gray-900 hover:text-green-600 cursor-pointer">
+              {post.user.username}
+            </p>
             <p className="text-xs text-gray-500">{post.timestamp}</p>
           </div>
         </div>
 
+        {/* Kebab Menu */}
         <div className="relative">
           <button
             onClick={() => setShowMenu(!showMenu)}
-            className="p-1 text-gray-600 hover:text-gray-900"
+            className="text-gray-600 hover:text-gray-900 p-2 hover:bg-gray-100 rounded-full transition-colors"
           >
             <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
               <circle cx="12" cy="6" r="1.5" />
@@ -137,107 +38,83 @@ const PostCard = ({
             </svg>
           </button>
 
+          {/* Dropdown Menu */}
           {showMenu && (
-            <div className="absolute right-0 mt-2 w-36 bg-white rounded-md border shadow-md z-10">
-              {isOwner ? (
-                <>
-                  <button
-                    className="block px-4 py-2 text-sm hover:bg-green-50 w-full text-left"
-                    onClick={() => setShowEditForm(true)}
-                  >
-                    Edit Post
-                  </button>
-
-                  <button
-                    onClick={handleDeletePost}
-                    disabled={deleting}
-                    className="block px-4 py-2 text-sm text-red-600 hover:bg-red-50 w-full text-left border-t"
-                  >
-                    Delete Post
-                  </button>
-                </>
-              ) : (
-                <>
-                  {isFollowing ? (
-                    <button
-                      onClick={() => handleUnfollow(post.userId)}
-                      className="block px-4 py-2 text-sm hover:bg-green-50 w-full text-left"
-                    >
-                      Unfollow
-                    </button>
-                  ) : (
-                    <button
-                      onClick={() => handleFollow(post.userId)}
-                      className="block px-4 py-2 text-sm hover:bg-green-50 w-full text-left"
-                    >
-                      Follow
-                    </button>
-                  )}
-
-                  <button
-                    onClick={handleShare}
-                    className="block px-4 py-2 text-sm hover:bg-green-50 w-full text-left"
-                  >
-                    Share
-                  </button>
-
-                  <button className="block px-4 py-2 text-sm text-red-600 hover:bg-red-50 w-full text-left border-t">
-                    Report
-                  </button>
-                </>
-              )}
+            <div className="absolute right-0 mt-2 w-40 bg-white border border-gray-100 rounded-xl shadow-lg z-20 overflow-hidden animate-fadeIn">
+              <button className="w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-50 hover:text-green-600 text-sm font-medium transition-colors">
+                Follow
+              </button>
+              <button className="w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-50 hover:text-green-600 text-sm font-medium transition-colors">
+                Share
+              </button>
+              <button className="w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-50 hover:text-red-600 text-sm font-medium transition-colors border-t border-gray-100">
+                Report
+              </button>
             </div>
           )}
         </div>
       </div>
 
-      {post.image ? (
-        <img src={post.image} alt="Post" className="w-full h-80 object-cover" />
-      ) : (
-        <div className="h-80 bg-green-50 flex items-center justify-center">
-          <span className="text-gray-400 text-sm">No image</span>
-        </div>
-      )}
+      {/* Post Image Placeholder */}
+      <div className="bg-gradient-to-br from-indigo-50 via-pink-50 to-purple-50 flex items-center justify-center h-96 relative group">
+        <div className="absolute inset-0 bg-gradient-to-br from-indigo-100/50 to-pink-100/50 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+        <span className="text-gray-400 text-sm font-medium z-10">Post Content</span>
+      </div>
 
-      <div className="px-4 py-3">
+      {/* Post Actions */}
+      <div className="px-4 pt-3 pb-2">
+        <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center gap-4">
+            <button className="text-gray-600 hover:text-red-500 transition-all transform hover:scale-110">
+              <svg
+                className="w-7 h-7"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth={2}
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
+                />
+              </svg>
+            </button>
 
-        <div className="flex items-center gap-6">
-          <button
-            onClick={handleLike}
-            className={`flex items-center gap-1 transition-all ${
-              liked ? "text-red-500 scale-110" : "text-gray-600"
-            } hover:scale-110`}
-          >
-            <svg
-              className="w-6 h-6"
-              fill={liked ? "red" : "none"}
-              stroke={liked ? "red" : "currentColor"}
-              strokeWidth={2}
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
-              />
-            </svg>
-            <span className="text-sm">
-              {likes.length ? likes.length : likes}
-            </span>
-          </button>
+            <button className="text-gray-600 hover:text-indigo-600 transition-all transform hover:scale-110">
+              <svg
+                className="w-7 h-7"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth={2}
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
+                />
+              </svg>
+            </button>
 
-          <button
-            onClick={() => {
-              if (currentUser.trustScore < 20) {
-                alert("Your Trust Score is too low to comment.");
-                return;
-              }
-              setShowCommentBox(!showCommentBox);
-            }}
-            className={`text-gray-600 hover:text-green-600 ${
-              currentUser.trustScore < 20 ? "opacity-50 cursor-not-allowed" : ""
-            }`}
-          >
+            <button className="text-gray-600 hover:text-indigo-600 transition-all transform hover:scale-110">
+              <svg
+                className="w-7 h-7"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth={2}
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"
+                />
+              </svg>
+            </button>
+          </div>
+
+          <button className="text-gray-600 hover:text-indigo-600 transition-all transform hover:scale-110">
             <svg
               className="w-6 h-6"
               fill="none"
@@ -248,60 +125,25 @@ const PostCard = ({
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
-                d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
+                d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"
               />
             </svg>
-            <span className="text-sm">{comments.length}</span>
           </button>
         </div>
 
         {post.caption && (
-          <div className="text-sm text-gray-700 mt-2">
-            <span className="font-semibold mr-2">{post.user.username}</span>
-            {post.caption}
+          <div className="text-sm mb-2">
+            <span className="font-semibold mr-2 text-gray-900">
+              {post.user.username}
+            </span>
+            <span className="text-gray-700">{post.caption}</span>
           </div>
         )}
 
-        {showCommentBox && (
-          <>
-            <div className="mt-3 space-y-2">
-              {comments.map((c: any) => (
-                <div key={c._id} className="text-sm bg-gray-100 rounded-md p-2">
-                  <span className="font-semibold">{c.user?.name || "User"}: </span>
-                  {c.text || c}
-                </div>
-              ))}
-            </div>
-
-            <div className="mt-3 flex items-center gap-2">
-              <input
-                disabled={currentUser.trustScore < 20}
-                value={commentText}
-                onChange={(e) => setCommentText(e.target.value)}
-                placeholder={currentUser.trustScore < 20
-                  ? "Your Trust Score is too low to comment"
-                  : "Add a comment..."}
-                className={`w-full border rounded-md px-2 py-1 text-sm ${currentUser.trustScore < 20 ? "bg-gray-200 cursor-not-allowed" : ""}`}
-              />
-              <button
-                disabled={currentUser.trustScore < 20}
-                onClick={handleComment}
-                className={`rounded-md px-3 py-1 text-sm text-white ${
-                  currentUser.trustScore < 20
-                    ? "bg-gray-400 cursor-not-allowed"
-                    : "bg-green-600 hover:bg-green-700"
-                }`}
-              >
-                Post
-              </button>
-            </div>
-          </>
-        )}
+        <button className="text-xs text-gray-400 hover:text-gray-600 font-medium">
+          View all comments
+        </button>
       </div>
-
-      {showEditForm && (
-        <CreatePostForm setShowCreatePost={setShowEditForm} postToEdit={post}  />
-      )}
     </div>
   );
 };
