@@ -19,7 +19,7 @@ const [user, setUser] = useState<interfaces.User | null>(null);
     rootClient
       .get("/profile")
       .then((res) => {
-        console.log("fucxzs",res.data)
+        console.log("profile response data",res.data)
         setUser(res.data);
         setLoading(false);
       })
