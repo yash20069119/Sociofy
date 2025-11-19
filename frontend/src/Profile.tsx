@@ -239,9 +239,7 @@ const Profile = ({ user, currentUser: propCurrentUser }: ProfileProps) => {
                     : "hover:text-gray-800 border-transparent"
                 }`}
               >
-                {tab === "posts" && "📷 POSTS"}
-                {tab === "saved" && "📑 SAVED"}
-                {tab === "tagged" && "🏷 TAGGED"}
+                {tab === "posts" && " POSTS"}
               </button>
             ))}
           </div>
